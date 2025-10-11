@@ -1,11 +1,11 @@
 file(GLOB_RECURSE HEADERS *.hpp)
 file(GLOB_RECURSE SOURCES *.cpp)
 
-add_library(Lib1)
+add_library(Core)
 
-configure_library(Lib1 "${HEADERS}" "${SOURCES}")
+configure_library(Core "${HEADERS}" "${SOURCES}")
 
 install_library(
-    Lib1
+    Core
     DESCRIPTION "This is a library"
 )
