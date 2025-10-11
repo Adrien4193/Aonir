@@ -1,6 +1,6 @@
-# C++ template project
+# C++ game engine
 
-My C++ template project (Windows only for now).
+My C++ game engine (Windows only for now).
 
 ## Requirements
 
@@ -80,6 +80,7 @@ Example settings.json to have:
             ]
         }
     },
+    "terminal.integrated.defaultProfile.windows": "Developer PowerShell",
     "cmake.useVsDeveloperEnvironment": "always",
     "C_Cpp.codeAnalysis.exclude": {
         "Tests/": true
