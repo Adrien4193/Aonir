@@ -1,0 +1,6 @@
+.vs
+.vscode
+[Bb]in
+[Bb]uild
+[Ii]nstall
+CMakeUserPresets.json
