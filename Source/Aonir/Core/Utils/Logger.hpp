@@ -56,7 +56,6 @@ namespace Aonir
             }
 
             auto message = std::format(format, std::forward<Args>(args)...);
-
             auto record = LogRecord(m_name, m_level, message);
 
             m_handler(record);

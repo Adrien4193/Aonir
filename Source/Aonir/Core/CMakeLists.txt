@@ -7,5 +7,5 @@ configure_library(Core "${HEADERS}" "${SOURCES}")
 
 install_library(
     Core
-    DESCRIPTION "This is a library"
+    DESCRIPTION "Core features of the engine"
 )
