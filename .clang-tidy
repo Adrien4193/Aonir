@@ -14,6 +14,7 @@ Checks:
   - -modernize-use-nodiscard
   - -readability-identifier-length
   - -readability-magic-numbers
+  - -portability-avoid-pragma-once
 
 WarningsAsErrors: "*"
 HeaderFilterRegex: "Source[\\/]Aonir.*"
