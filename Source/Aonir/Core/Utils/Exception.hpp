@@ -33,14 +33,17 @@ namespace Aonir
     class BaseException : public Exception
     {
     private:
-        T m_data{};
+        T m_data;
 
     public:
         explicit BaseException(
             std::string message,
             const std::source_location &source = std::source_location::current(),
-            std::stacktrace stacktrace = std::stacktrace::current()) requires std::constructible_from<T>:
-            Exception(std::move(message), source, std::move(stacktrace))
+            std::stacktrace stacktrace = std::stacktrace::current())
+        requires std::constructible_from<T>
+            :
+            Exception(std::move(message), source, std::move(stacktrace)),
+            m_data{}
         {
         }
 
