@@ -2,6 +2,8 @@
 
 #include <cstddef>
 
+// NOLINTBEGIN(misc-include-cleaner)
+
 #define GLM_FORCE_SIZE_T_LENGTH
 #include <glm/glm.hpp>
 
@@ -20,3 +22,5 @@ namespace Aonir
     using Vector3 = Vector<float, 3>;
     using Vector4 = Vector<float, 3>;
 }
+
+// NOLINTEND(misc-include-cleaner)
