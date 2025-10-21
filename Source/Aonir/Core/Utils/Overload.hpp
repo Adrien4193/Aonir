@@ -3,7 +3,7 @@
 namespace Aonir
 {
     template<typename... Ts>
-    struct Overload
+    struct Overload : Ts...
     {
         using Ts::operator()...;
     };

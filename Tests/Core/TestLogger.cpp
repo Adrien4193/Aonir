@@ -4,7 +4,7 @@
 
 using namespace Aonir;
 
-TEST(Logger, LevelName)
+TEST(Logger, LevelName) // NOLINT
 {
     ASSERT_EQ(GetLogLevelName(LogLevel::Trace), "Trace");
     ASSERT_EQ(GetLogLevelName(LogLevel::Debug), "Debug");
@@ -14,7 +14,7 @@ TEST(Logger, LevelName)
     ASSERT_EQ(GetLogLevelName(LogLevel::Fatal), "Fatal");
 }
 
-TEST(Logger, RecordFormat)
+TEST(Logger, RecordFormat) // NOLINT
 {
     auto message = FormatLogRecord({
         .name = "Test",
@@ -25,7 +25,7 @@ TEST(Logger, RecordFormat)
     ASSERT_EQ(message, "[Debug][Test]: This is a test.");
 }
 
-TEST(Logger, Usage)
+TEST(Logger, Usage) // NOLINT
 {
     auto called = false;
     auto logger = Logger("Test", LogLevel::Debug, [&](const auto &) { called = true; });
