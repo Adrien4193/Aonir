@@ -1,0 +1,5 @@
+if(WIN32)
+    add_subdirectory(Win32)
+else()
+    message(FATAL_ERROR "Unsupported platform")
+endif()

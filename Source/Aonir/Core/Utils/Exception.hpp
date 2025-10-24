@@ -8,7 +8,7 @@
 
 namespace Aonir
 {
-    class Exception : std::exception
+    class Exception : public std::exception
     {
     private:
         std::string m_message;
