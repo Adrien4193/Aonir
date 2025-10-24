@@ -6,4 +6,5 @@ target_link_libraries(
     Sandbox
     PRIVATE
     Core
+    Platform
 )

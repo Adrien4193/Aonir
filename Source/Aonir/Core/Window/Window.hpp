@@ -57,14 +57,14 @@ namespace Aonir
     public:
         AONIR_CORE_API explicit Window(const WindowPrivate &window);
 
-        AONIR_CORE_API auto GetNativeHandle() const -> NativeWindowHandle;
+        [[nodiscard]] AONIR_CORE_API auto GetNativeHandle() const -> NativeWindowHandle;
         AONIR_CORE_API auto Show() -> void;
-        AONIR_CORE_API auto GetTitle() const -> const std::string &;
+        [[nodiscard]] AONIR_CORE_API auto GetTitle() const -> const std::string &;
         AONIR_CORE_API auto SetTitle(std::string_view title) -> void;
-        AONIR_CORE_API auto GetPosition() const -> const WindowPosition &;
+        [[nodiscard]] AONIR_CORE_API auto GetPosition() const -> const WindowPosition &;
         AONIR_CORE_API auto SetPosition(const WindowPosition &position) -> void;
-        AONIR_CORE_API auto GetSize() const -> const WindowSize &;
+        [[nodiscard]] AONIR_CORE_API auto GetSize() const -> const WindowSize &;
         AONIR_CORE_API auto Resize(const WindowSize &size) -> void;
-        AONIR_CORE_API auto GetEvents() const -> const std::vector<WindowEvent> &;
+        [[nodiscard]] AONIR_CORE_API auto GetEvents() const -> const std::vector<WindowEvent> &;
     };
 }
