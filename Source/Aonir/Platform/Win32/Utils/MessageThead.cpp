@@ -2,19 +2,15 @@
 
 #include <cassert>
 #include <functional>
-#include <memory>
+#include <future>
 #include <thread>
 #include <utility>
 
 #include <Windows.h> // NOLINT(misc-include-cleaner)
 
-#include <WinBase.h>
 #include <WinUser.h>
-#include <handleapi.h>
 #include <minwindef.h>
 #include <processthreadsapi.h>
-#include <synchapi.h>
-#include <winnt.h>
 
 #include "LastError.hpp"
 
@@ -23,46 +19,6 @@ namespace
     using namespace Aonir;
 
     constexpr UINT StartTaskMessage = WM_USER;
-
-    auto Destroy(HANDLE handle) -> void
-    {
-        auto success = CloseHandle(handle);
-        assert(success == TRUE);
-    }
-
-    using EventHandle = std::unique_ptr<void, decltype([](HANDLE handle) { Destroy(handle); })>;
-
-    auto CreateEventHandle() -> EventHandle
-    {
-        auto *handle = CreateEventW(nullptr, FALSE, FALSE, nullptr);
-
-        if (handle == nullptr)
-        {
-            throw LastError("Failed to create event");
-        }
-
-        return EventHandle(handle);
-    }
-
-    auto Wait(HANDLE event) -> void
-    {
-        auto code = WaitForSingleObjectEx(event, INFINITE, FALSE);
-
-        if (code != WAIT_OBJECT_0)
-        {
-            throw LastError("Failed to wait for event");
-        }
-    }
-
-    auto Notify(HANDLE event) -> void
-    {
-        auto success = SetEvent(event);
-
-        if (success == FALSE)
-        {
-            throw LastError("Failed to set event");
-        }
-    }
 
     auto RunTask(WPARAM wparam) -> void
     {
@@ -135,15 +91,15 @@ namespace Aonir
 
     auto StartMessageThread() -> MessageThread
     {
-        auto event = CreateEventHandle();
-        auto *ptr = event.get();
+        auto promise = std::promise<void>();
+        auto future = promise.get_future();
 
-        auto thread = std::jthread([=]
+        auto thread = std::jthread([&]
         {
             try
             {
                 CreateMessageQueue();
-                Notify(ptr);
+                promise.set_value();
                 RunMessageLoop();
             }
             catch (...)
@@ -152,7 +108,7 @@ namespace Aonir
             }
         });
 
-        Wait(ptr);
+        future.get();
 
         auto id = GetThreadId(thread.native_handle());
 
