@@ -29,7 +29,7 @@ namespace
         auto x = static_cast<std::size_t>(LOWORD(lparam));
         auto y = static_cast<std::size_t>(HIWORD(lparam));
 
-        listener(WindowMove{x, y});
+        listener(WindowMove({x, y}));
     }
 
     auto OnResize(const WindowListener &listener, LPARAM lparam) -> void

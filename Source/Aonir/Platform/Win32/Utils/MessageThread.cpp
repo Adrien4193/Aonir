@@ -18,11 +18,11 @@ namespace
 {
     using namespace Aonir;
 
-    constexpr UINT StartTaskMessage = WM_USER;
+    constexpr UINT RunTaskMessage = WM_USER;
 
     auto RunTask(WPARAM wparam) -> void
     {
-        const auto &task = *reinterpret_cast<const std::function<void()> *>(wparam); // NOLINT(performance-no-int-to-ptr)
+        const auto &task = *reinterpret_cast<const TaskMessage *>(wparam); // NOLINT(performance-no-int-to-ptr)
         task();
     }
 
@@ -53,7 +53,7 @@ namespace
                 continue;
             }
 
-            if (message.message == StartTaskMessage)
+            if (message.message == RunTaskMessage)
             {
                 RunTask(message.wParam);
             }
@@ -63,13 +63,13 @@ namespace
 
 namespace Aonir
 {
-    MessageThread::MessageThread(DWORD id, std::jthread thread):
+    Win32MessageThread::Win32MessageThread(DWORD id, std::jthread thread):
         m_id(id),
         m_thread(std::move(thread))
     {
     }
 
-    MessageThread::~MessageThread()
+    Win32MessageThread::~Win32MessageThread()
     {
         if (m_thread.joinable())
         {
@@ -78,18 +78,19 @@ namespace Aonir
         }
     }
 
-    auto MessageThread::Start(const std::function<void()> &task) const -> void
+    auto Win32MessageThread::Start(const TaskMessage &task) const -> void
     {
         auto wparam = reinterpret_cast<WPARAM>(&task);
-        auto success = PostThreadMessageW(m_id, StartTaskMessage, wparam, 0);
+
+        auto success = PostThreadMessageW(m_id, RunTaskMessage, wparam, 0);
 
         if (success == FALSE)
         {
-            throw LastError("Failed to post message to GUI thread");
+            throw Win32LastError("Failed to post message to GUI thread");
         }
     }
 
-    auto StartMessageThread() -> MessageThread
+    auto StartWin32MessageThread() -> Win32MessageThread
     {
         auto promise = std::promise<void>();
         auto future = promise.get_future();
@@ -112,6 +113,6 @@ namespace Aonir
 
         auto id = GetThreadId(thread.native_handle());
 
-        return MessageThread(id, std::move(thread));
+        return Win32MessageThread(id, std::move(thread));
     }
 }

@@ -7,12 +7,12 @@
 
 namespace Aonir
 {
-    class SystemException : public BaseException<NoExceptionData>
+    class Win32Exception : public BaseException<NoExceptionData>
     {
     public:
         using BaseException::BaseException;
     };
 
-    auto FormatLastError(std::string_view message) -> std::string;
-    auto LastError(std::string_view message) -> SystemException;
+    auto FormatWin32LastError(std::string_view message) -> std::string;
+    auto Win32LastError(std::string_view message) -> Win32Exception;
 }

@@ -42,10 +42,10 @@ namespace Aonir
     public:
         AONIR_CORE_API explicit Logger(std::string name, LogLevel level, LogHandler handler);
 
-        AONIR_CORE_API auto GetName() const -> const std::string &;
-        AONIR_CORE_API auto GetLevel() const -> LogLevel;
+        [[nodiscard]] AONIR_CORE_API auto GetName() const -> const std::string &;
+        [[nodiscard]] AONIR_CORE_API auto GetLevel() const -> LogLevel;
         AONIR_CORE_API auto SetLevel(LogLevel level) -> void;
-        AONIR_CORE_API auto IsEnabled(LogLevel level) const -> bool;
+        [[nodiscard]] AONIR_CORE_API auto IsEnabled(LogLevel level) const -> bool;
 
         template<typename... Args>
         auto Log(LogLevel level, std::format_string<Args...> format, Args &&...args) -> void

@@ -10,15 +10,15 @@
 
 namespace Aonir
 {
-    auto FormatLastError(std::string_view message) -> std::string
+    auto FormatWin32LastError(std::string_view message) -> std::string
     {
         auto code = GetLastError();
         return std::format("{} (last error = {})", message, code);
     }
 
-    auto LastError(std::string_view message) -> SystemException
+    auto Win32LastError(std::string_view message) -> Win32Exception
     {
-        auto description = FormatLastError(message);
-        return SystemException{description};
+        auto description = FormatWin32LastError(message);
+        return Win32Exception{description};
     }
 }

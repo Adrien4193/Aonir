@@ -18,11 +18,11 @@ namespace Aonir
     public:
         AONIR_CORE_API explicit Exception(std::string message, const std::source_location &source, std::stacktrace stacktrace);
 
-        AONIR_CORE_API auto what() const -> const char * override;
+        [[nodiscard]] AONIR_CORE_API auto what() const -> const char * override;
 
-        AONIR_CORE_API auto GetMessage() const -> const std::string &;
-        AONIR_CORE_API auto GetSource() const -> const std::source_location &;
-        AONIR_CORE_API auto GetStacktrace() const -> const std::stacktrace &;
+        [[nodiscard]] AONIR_CORE_API auto GetMessage() const -> const std::string &;
+        [[nodiscard]] AONIR_CORE_API auto GetSource() const -> const std::source_location &;
+        [[nodiscard]] AONIR_CORE_API auto GetStacktrace() const -> const std::stacktrace &;
     };
 
     struct NoExceptionData
@@ -57,7 +57,7 @@ namespace Aonir
         {
         }
 
-        auto GetData() const -> const T &
+        [[nodiscard]] auto GetData() const -> const T &
         {
             return m_data;
         }

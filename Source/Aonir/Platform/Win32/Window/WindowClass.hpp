@@ -20,7 +20,7 @@ namespace Aonir
         std::unique_ptr<Win32WindowListener> listener;
     };
 
-    class WindowClass
+    class Win32WindowClass
     {
     private:
         struct Deleter
@@ -34,10 +34,10 @@ namespace Aonir
         std::unique_ptr<const wchar_t, Deleter> m_className;
 
     public:
-        explicit WindowClass(HINSTANCE instance, LPCWSTR className);
+        explicit Win32WindowClass(HINSTANCE instance, LPCWSTR className);
 
         auto Instanciate(const WindowSettings &settings, WindowListener listener) -> Win32Window;
     };
 
-    auto CreateWindowClass(HINSTANCE instance, std::string_view name) -> WindowClass;
+    auto CreateWin32WindowClass(HINSTANCE instance, std::string_view name) -> Win32WindowClass;
 }

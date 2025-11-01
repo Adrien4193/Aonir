@@ -27,7 +27,7 @@ namespace Aonir
     {
     }
 
-    auto Win32WindowHandle::GetHandle() const -> HWND
+    auto Win32WindowHandle::GetNativeHandle() const -> HWND
     {
         return m_handle.get();
     }
@@ -45,7 +45,7 @@ namespace Aonir
 
         if (success == FALSE)
         {
-            throw LastError("Failed to set window title");
+            throw Win32LastError("Failed to set window title");
         }
     }
 
@@ -60,7 +60,7 @@ namespace Aonir
 
         if (success == FALSE)
         {
-            throw LastError("Failed to set window position");
+            throw Win32LastError("Failed to set window position");
         }
     }
 
@@ -75,7 +75,7 @@ namespace Aonir
 
         if (success == FALSE)
         {
-            throw LastError("Failed to set window size");
+            throw Win32LastError("Failed to set window size");
         }
     }
 }

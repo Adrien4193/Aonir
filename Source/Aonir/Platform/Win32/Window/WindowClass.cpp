@@ -51,19 +51,19 @@ namespace
 
 namespace Aonir
 {
-    auto WindowClass::Deleter::operator()(LPCWSTR className) const -> void
+    auto Win32WindowClass::Deleter::operator()(LPCWSTR className) const -> void
     {
         auto success = UnregisterClassW(className, instance);
         assert(success == TRUE);
     }
 
-    WindowClass::WindowClass(HINSTANCE instance, LPCWSTR className):
+    Win32WindowClass::Win32WindowClass(HINSTANCE instance, LPCWSTR className):
         m_instance(instance),
         m_className(className, Deleter{instance})
     {
     }
 
-    auto WindowClass::Instanciate(const WindowSettings &settings, WindowListener listener) -> Win32Window
+    auto Win32WindowClass::Instanciate(const WindowSettings &settings, WindowListener listener) -> Win32Window
     {
         auto options = DWORD(0);
         auto title = ToUtf16(settings.title);
@@ -81,13 +81,13 @@ namespace Aonir
 
         if (window == nullptr)
         {
-            throw LastError("Failed to create window");
+            throw Win32LastError("Failed to create window");
         }
 
         return {.handle = Win32WindowHandle(window), .listener = std::move(ptr)};
     }
 
-    auto CreateWindowClass(HINSTANCE instance, std::string_view name) -> WindowClass
+    auto CreateWin32WindowClass(HINSTANCE instance, std::string_view name) -> Win32WindowClass
     {
         auto wname = ToUtf16(name);
 
@@ -101,11 +101,11 @@ namespace Aonir
 
         if (atom == 0)
         {
-            throw LastError("Failed to create window class");
+            throw Win32LastError("Failed to create window class");
         }
 
         const auto *className = reinterpret_cast<const wchar_t *>(atom); // NOLINT(performance-no-int-to-ptr)
 
-        return WindowClass(instance, className);
+        return Win32WindowClass(instance, className);
     }
 }

@@ -10,21 +10,22 @@
 
 namespace Aonir
 {
-    class MessageThread
+    using TaskMessage = std::function<auto()->void>;
+
+    class Win32MessageThread
     {
     private:
         DWORD m_id;
         std::jthread m_thread;
 
     public:
-        explicit MessageThread(DWORD id, std::jthread thread);
-        ~MessageThread();
+        explicit Win32MessageThread(DWORD id, std::jthread thread);
+        Win32MessageThread(const Win32MessageThread &) = delete;
+        Win32MessageThread(Win32MessageThread &&) = default;
+        ~Win32MessageThread();
 
-        MessageThread(const MessageThread &) = delete;
-        MessageThread(MessageThread &&) = default;
-
-        auto operator=(const MessageThread &) -> MessageThread & = delete;
-        auto operator=(MessageThread &&) -> MessageThread & = default;
+        auto operator=(const Win32MessageThread &) -> Win32MessageThread & = delete;
+        auto operator=(Win32MessageThread &&) -> Win32MessageThread & = default;
 
         auto Run(std::invocable<> auto &&task) const -> decltype(task())
         {
@@ -33,7 +34,7 @@ namespace Aonir
             auto promise = std::promise<ResultType>();
             auto future = promise.get_future();
 
-            auto wrapper = std::function<void()>([&]
+            auto wrapper = TaskMessage([&]
             {
                 try
                 {
@@ -59,8 +60,8 @@ namespace Aonir
         }
 
     private:
-        auto Start(const std::function<void()> &task) const -> void;
+        auto Start(const TaskMessage &task) const -> void;
     };
 
-    auto StartMessageThread() -> MessageThread;
+    auto StartWin32MessageThread() -> Win32MessageThread;
 }

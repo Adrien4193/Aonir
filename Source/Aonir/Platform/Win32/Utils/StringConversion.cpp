@@ -26,7 +26,7 @@ namespace Aonir
 
         if (required <= 0)
         {
-            throw LastError("Conversion preparation to UTF-16 failed");
+            throw Win32LastError("Conversion preparation to UTF-16 failed");
         }
 
         auto result = std::string(required, '\0');
@@ -35,7 +35,7 @@ namespace Aonir
 
         if (written != required)
         {
-            throw LastError("Conversion to UTF-16 failed");
+            throw Win32LastError("Conversion to UTF-16 failed");
         }
 
         return result;
@@ -55,7 +55,7 @@ namespace Aonir
 
         if (required <= 0)
         {
-            throw LastError("Conversion preparation to UTF-8 failed");
+            throw Win32LastError("Conversion preparation to UTF-8 failed");
         }
 
         auto result = std::wstring(required, L'\0');
@@ -64,7 +64,7 @@ namespace Aonir
 
         if (written != required)
         {
-            throw LastError("Conversion to UTF-8 failed");
+            throw Win32LastError("Conversion to UTF-8 failed");
         }
 
         return result;
