@@ -51,7 +51,7 @@ namespace Aonir
 
     auto Win32WindowHandle::SetPosition(const WindowPosition &position) -> void
     {
-        auto flags = SWP_NOSIZE | SWP_NOACTIVATE;
+        auto flags = UINT(SWP_NOSIZE | SWP_NOACTIVATE);
 
         auto x = static_cast<int>(position.x);
         auto y = static_cast<int>(position.y);
@@ -66,7 +66,7 @@ namespace Aonir
 
     auto Win32WindowHandle::Resize(const WindowSize &size) -> void
     {
-        auto flags = SWP_NOMOVE | SWP_NOACTIVATE;
+        auto flags = UINT(SWP_NOMOVE | SWP_NOACTIVATE);
 
         auto width = static_cast<int>(size.width);
         auto height = static_cast<int>(size.height);

@@ -3,6 +3,7 @@
 
 #include <Aonir/Core/Utils/Logger.hpp>
 #include <Aonir/Core/Utils/Overload.hpp>
+#include <Aonir/Core/Window/WindowEvents.hpp>
 #include <Aonir/Core/Window/WindowManager.hpp>
 
 #include <Aonir/Platform/WindowFactory.hpp>

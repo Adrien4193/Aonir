@@ -67,7 +67,7 @@ namespace Aonir
     {
         auto options = DWORD(0);
         auto title = ToUtf16(settings.title);
-        auto style = WS_OVERLAPPEDWINDOW;
+        auto style = DWORD(WS_OVERLAPPEDWINDOW);
         auto x = static_cast<int>(settings.position.x);
         auto y = static_cast<int>(settings.position.y);
         auto width = static_cast<int>(settings.size.width);

@@ -1,5 +1,6 @@
 #include "StringConversion.hpp"
 
+#include <cstddef>
 #include <string>
 #include <string_view>
 
@@ -29,7 +30,7 @@ namespace Aonir
             throw Win32LastError("Conversion preparation to UTF-16 failed");
         }
 
-        auto result = std::string(required, '\0');
+        auto result = std::string(static_cast<std::size_t>(required), '\0');
 
         auto written = WideCharToMultiByte(CP_UTF8, 0, ptr, size, result.data(), required, nullptr, nullptr);
 
@@ -58,7 +59,7 @@ namespace Aonir
             throw Win32LastError("Conversion preparation to UTF-8 failed");
         }
 
-        auto result = std::wstring(required, L'\0');
+        auto result = std::wstring(static_cast<std::size_t>(required), L'\0');
 
         auto written = MultiByteToWideChar(CP_UTF8, 0, ptr, size, result.data(), required);
 
