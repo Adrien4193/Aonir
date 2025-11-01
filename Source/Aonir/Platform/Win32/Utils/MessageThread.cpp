@@ -73,7 +73,7 @@ namespace Aonir
     {
         if (m_thread.joinable())
         {
-            auto success = PostThreadMessageW(m_id, WM_QUIT, 0, 0);
+            [[maybe_unused]] auto success = PostThreadMessageW(m_id, WM_QUIT, 0, 0);
             assert(success == TRUE);
         }
     }

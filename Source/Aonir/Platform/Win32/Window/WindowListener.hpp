@@ -18,6 +18,6 @@ namespace Aonir
     public:
         explicit Win32WindowListener(WindowListener listener);
 
-        auto ProcessEvent(HWND window, UINT type, WPARAM wparam, LPARAM lparam) -> LRESULT;
+        auto ProcessMessage(HWND window, UINT type, WPARAM wparam, LPARAM lparam) -> LRESULT;
     };
 }

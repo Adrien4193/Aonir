@@ -45,7 +45,7 @@ namespace
     auto CALLBACK ProcessMessage(HWND window, UINT type, WPARAM wparam, LPARAM lparam) -> LRESULT
     {
         auto &listener = type == WM_CREATE ? SetListener(window, lparam) : GetListener(window);
-        return listener.ProcessEvent(window, type, wparam, lparam);
+        return listener.ProcessMessage(window, type, wparam, lparam);
     }
 }
 
@@ -53,7 +53,7 @@ namespace Aonir
 {
     auto Win32WindowClass::Deleter::operator()(LPCWSTR className) const -> void
     {
-        auto success = UnregisterClassW(className, instance);
+        [[maybe_unused]] auto success = UnregisterClassW(className, instance);
         assert(success == TRUE);
     }
 
@@ -92,8 +92,15 @@ namespace Aonir
         auto wname = ToUtf16(name);
 
         auto settings = WNDCLASSW{
+            .style = 0,
             .lpfnWndProc = &ProcessMessage,
+            .cbClsExtra = 0,
+            .cbWndExtra = 0,
             .hInstance = instance,
+            .hIcon = nullptr,
+            .hCursor = nullptr,
+            .hbrBackground = nullptr,
+            .lpszMenuName = nullptr,
             .lpszClassName = wname.c_str(),
         };
 

@@ -18,7 +18,7 @@ namespace Aonir
 {
     auto Win32WindowHandle::Deleter::operator()(HWND handle) const -> void
     {
-        auto success = DestroyWindow(handle);
+        [[maybe_unused]] auto success = DestroyWindow(handle);
         assert(success == TRUE);
     }
 

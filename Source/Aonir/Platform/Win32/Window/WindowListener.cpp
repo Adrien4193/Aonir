@@ -1,6 +1,7 @@
 #include "WindowListener.hpp"
 
 #include <cstddef>
+#include <exception>
 #include <utility>
 
 #include <Windows.h> // NOLINT(misc-include-cleaner)
@@ -53,24 +54,31 @@ namespace Aonir
     {
     }
 
-    auto Win32WindowListener::ProcessEvent(HWND window, UINT type, WPARAM wparam, LPARAM lparam) -> LRESULT
+    auto Win32WindowListener::ProcessMessage(HWND window, UINT type, WPARAM wparam, LPARAM lparam) -> LRESULT
     {
-        switch (type)
+        try
         {
-        case WM_SETTEXT:
-            OnSetTitle(m_listener, lparam);
-            break;
-        case WM_MOVE:
-            OnMove(m_listener, lparam);
-            return 0;
-        case WM_SIZE:
-            OnResize(m_listener, lparam);
-            return 0;
-        case WM_CLOSE:
-            OnClose(m_listener);
-            return 0;
-        default:
-            break;
+            switch (type)
+            {
+            case WM_SETTEXT:
+                OnSetTitle(m_listener, lparam);
+                break;
+            case WM_MOVE:
+                OnMove(m_listener, lparam);
+                return 0;
+            case WM_SIZE:
+                OnResize(m_listener, lparam);
+                return 0;
+            case WM_CLOSE:
+                OnClose(m_listener);
+                return 0;
+            default:
+                break;
+            }
+        }
+        catch (...)
+        {
+            m_listener(WindowError(std::current_exception()));
         }
 
         return DefWindowProcW(window, type, wparam, lparam);
