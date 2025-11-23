@@ -31,10 +31,10 @@ namespace Aonir
         }
     }
 
-    auto FormatLogRecord(const LogRecord &record) -> std::string
+    auto FormatLogEntry(const LogEntry &entry) -> std::string
     {
-        auto level = GetLogLevelName(record.level);
-        return std::format("[{}][{}]: {}", level, record.name, record.message);
+        auto level = GetLogLevelName(entry.level);
+        return std::format("[{}][{}]: {}", level, entry.name, entry.message);
     }
 
     Logger::Logger(std::string name, LogLevel level, LogHandler handler):

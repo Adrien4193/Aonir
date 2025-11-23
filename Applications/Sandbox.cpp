@@ -13,7 +13,7 @@ using namespace Aonir;
 // NOLINTNEXTLINE(bugprone-exception-escape)
 auto main(int argc, const char **argv) -> int
 {
-    auto logger = Logger("Sandbox", LogLevel::Debug, [](const auto &record) { std::println("{}", FormatLogRecord(record)); });
+    auto logger = Logger("Sandbox", LogLevel::Debug, [](const auto &record) { std::println("{}", FormatLogEntry(record)); });
 
     logger.Info("argc: {}", argc);
 

@@ -21,16 +21,16 @@ namespace Aonir
 
     AONIR_CORE_API auto GetLogLevelName(LogLevel level) -> std::string_view;
 
-    struct LogRecord
+    struct LogEntry
     {
         std::string_view name;
         LogLevel level = LogLevel::Info;
         std::string_view message;
     };
 
-    AONIR_CORE_API auto FormatLogRecord(const LogRecord &record) -> std::string;
+    AONIR_CORE_API auto FormatLogEntry(const LogEntry &entry) -> std::string;
 
-    using LogHandler = std::function<auto(const LogRecord &)->void>;
+    using LogHandler = std::function<auto(const LogEntry &)->void>;
 
     class Logger
     {
@@ -56,9 +56,9 @@ namespace Aonir
             }
 
             auto message = std::format(format, std::forward<Args>(args)...);
-            auto record = LogRecord(m_name, m_level, message);
+            auto entry = LogEntry(m_name, m_level, message);
 
-            m_handler(record);
+            m_handler(entry);
         }
 
         template<typename... Args>

@@ -14,9 +14,9 @@ TEST(Logger, LevelName) // NOLINT
     ASSERT_EQ(GetLogLevelName(LogLevel::Fatal), "Fatal");
 }
 
-TEST(Logger, RecordFormat) // NOLINT
+TEST(Logger, EntryFormat) // NOLINT
 {
-    auto message = FormatLogRecord({
+    auto message = FormatLogEntry({
         .name = "Test",
         .level = LogLevel::Debug,
         .message = "This is a test.",

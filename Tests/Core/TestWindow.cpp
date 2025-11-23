@@ -8,7 +8,7 @@ using namespace Aonir;
 
 namespace
 {
-    auto CreateFactory(NativeWindowHandle handle, WindowBuffer &buffer) -> WindowFactory
+    auto MockWindowFactory(NativeWindowHandle handle, WindowBuffer &buffer) -> WindowFactory
     {
         return [&, handle](const WindowSettings &)
         {
@@ -35,7 +35,7 @@ TEST(Window, SingleWindow) // NOLINT
     };
 
     auto buffer = CreateWindowBuffer(settings);
-    auto factory = CreateFactory(handle, buffer);
+    auto factory = MockWindowFactory(handle, buffer);
     auto windows = WindowManager(factory);
 
     auto window = windows.Add(settings);

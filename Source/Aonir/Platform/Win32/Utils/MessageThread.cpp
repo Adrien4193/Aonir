@@ -18,7 +18,7 @@ namespace
 {
     using namespace Aonir;
 
-    constexpr UINT RunTaskMessage = WM_USER;
+    constexpr auto runTaskMessage = UINT(WM_USER);
 
     auto RunTask(WPARAM wparam) -> void
     {
@@ -53,7 +53,7 @@ namespace
                 continue;
             }
 
-            if (message.message == RunTaskMessage)
+            if (message.message == runTaskMessage)
             {
                 RunTask(message.wParam);
             }
@@ -82,7 +82,7 @@ namespace Aonir
     {
         auto wparam = reinterpret_cast<WPARAM>(&task);
 
-        auto success = PostThreadMessageW(m_id, RunTaskMessage, wparam, 0);
+        auto success = PostThreadMessageW(m_id, runTaskMessage, wparam, 0);
 
         if (success == FALSE)
         {
