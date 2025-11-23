@@ -41,11 +41,17 @@ auto main(int argc, const char **argv) -> int
         windows.Poll();
 
         auto handler = Overload{
+            [&](const WindowError &) { logger.Error("WindowError"); },
             [&](const WindowRename &e) { logger.Info("WindowRename: {}", e.title); },
             [&](const WindowMove &e) { logger.Info("WindowMove: {} {}", e.position.x, e.position.y); },
             [&](const WindowResize &e) { logger.Info("WindowResize: {} {}", e.size.width, e.size.height); },
             [&](const WindowClose &) { closed = true; },
-            [&](const WindowError &) { logger.Error("WindowError"); },
+            [&](const KeyPress &e) { logger.Info("KeyPress: {}", e.key.id); },
+            [&](const KeyRelease &e) { logger.Info("KeyRelease: {}", e.key.id); },
+            [&](const TextInput &e) { logger.Info("Text input: {}", e.codepoint); },
+            [&](const MouseButtonPress &e) { logger.Info("MouseButtonPress: {}", e.button.id); },
+            [&](const MouseButtonRelease &e) { logger.Info("MouseButtonRelease: {}", e.button.id); },
+            [&](const MouseMove &e) { logger.Info("MouseMove: {} {}", e.position.x, e.position.y); },
         };
 
         for (const auto &e : window.GetEvents())

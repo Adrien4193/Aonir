@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "WindowEvents.hpp"
+#include "WindowSettings.hpp"
 
 namespace Aonir
 {

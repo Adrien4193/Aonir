@@ -3,6 +3,7 @@
 #include <Aonir/Core/Window/Window.hpp>
 #include <Aonir/Core/Window/WindowEvents.hpp>
 #include <Aonir/Core/Window/WindowManager.hpp>
+#include <Aonir/Core/Window/WindowSettings.hpp>
 
 using namespace Aonir;
 

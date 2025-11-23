@@ -9,6 +9,7 @@
 
 #include "Window/Window.hpp"
 #include "Window/WindowEvents.hpp"
+#include "Window/WindowSettings.hpp"
 
 namespace Aonir
 {

@@ -4,6 +4,11 @@
 #include <string>
 #include <variant>
 
+#include <Aonir/Core/Input/Keyboard.hpp>
+#include <Aonir/Core/Input/Mouse.hpp>
+
+#include "WindowSettings.hpp"
+
 namespace Aonir
 {
     struct WindowError
@@ -16,25 +21,9 @@ namespace Aonir
         std::string title;
     };
 
-    struct WindowPosition
-    {
-        std::size_t x;
-        std::size_t y;
-
-        auto operator<=>(const WindowPosition &) const = default;
-    };
-
     struct WindowMove
     {
         WindowPosition position;
-    };
-
-    struct WindowSize
-    {
-        std::size_t width;
-        std::size_t height;
-
-        auto operator<=>(const WindowSize &) const = default;
     };
 
     struct WindowResize
@@ -46,5 +35,46 @@ namespace Aonir
     {
     };
 
-    using WindowEvent = std::variant<WindowError, WindowRename, WindowMove, WindowResize, WindowClose>;
+    struct MouseButtonPress
+    {
+        MouseButton button;
+    };
+
+    struct MouseButtonRelease
+    {
+        MouseButton button;
+    };
+
+    struct MouseMove
+    {
+        MousePosition position;
+    };
+
+    struct KeyPress
+    {
+        Key key;
+    };
+
+    struct KeyRelease
+    {
+        Key key;
+    };
+
+    struct TextInput
+    {
+        std::uint32_t codepoint;
+    };
+
+    using WindowEvent = std::variant<
+        WindowError,
+        WindowRename,
+        WindowMove,
+        WindowResize,
+        WindowClose,
+        MouseButtonPress,
+        MouseButtonRelease,
+        MouseMove,
+        KeyPress,
+        KeyRelease,
+        TextInput>;
 }

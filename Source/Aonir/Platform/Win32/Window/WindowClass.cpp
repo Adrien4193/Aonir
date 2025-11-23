@@ -12,7 +12,7 @@
 #include <windef.h>
 #include <winnt.h>
 
-#include <Aonir/Core/Window/Window.hpp>
+#include <Aonir/Core/Window/WindowSettings.hpp>
 
 #include <Aonir/Platform/Win32/Utils/LastError.hpp>
 #include <Aonir/Platform/Win32/Utils/StringConversion.hpp>

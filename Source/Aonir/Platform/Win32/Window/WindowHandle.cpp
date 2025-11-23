@@ -9,7 +9,7 @@
 #include <minwindef.h>
 #include <windef.h>
 
-#include "Aonir/Core/Window/WindowEvents.hpp"
+#include "Aonir/Core/Window/WindowSettings.hpp"
 
 #include <Aonir/Platform/Win32/Utils/LastError.hpp>
 #include <Aonir/Platform/Win32/Utils/StringConversion.hpp>

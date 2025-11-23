@@ -1,21 +1,16 @@
 #pragma once
 
+#include <compare>
 #include <functional>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include "WindowEvents.hpp"
+#include "WindowSettings.hpp"
 
 namespace Aonir
 {
-    struct WindowSettings
-    {
-        std::string title;
-        WindowPosition position;
-        WindowSize size;
-    };
-
     struct NativeWindowHandle
     {
         void *ptr;

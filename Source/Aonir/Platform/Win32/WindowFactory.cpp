@@ -17,6 +17,7 @@
 #include <Aonir/Core/Window/Window.hpp>
 #include <Aonir/Core/Window/WindowEvents.hpp>
 #include <Aonir/Core/Window/WindowManager.hpp>
+#include <Aonir/Core/Window/WindowSettings.hpp>
 
 #include <Aonir/Platform/Win32/Utils/MessageThread.hpp>
 #include <Aonir/Platform/Win32/Window/WindowClass.hpp>

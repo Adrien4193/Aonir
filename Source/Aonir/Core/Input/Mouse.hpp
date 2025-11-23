@@ -1,5 +1,6 @@
 #pragma once
 
+#include <compare>
 #include <cstddef>
 
 namespace Aonir
@@ -15,26 +16,11 @@ namespace Aonir
     constexpr auto rightMouseButton = MouseButton{1};
     constexpr auto middleMouseButton = MouseButton{2};
 
-    struct MouseButtonPress
-    {
-        MouseButton button;
-    };
-
-    struct MouseButtonRelease
-    {
-        MouseButton button;
-    };
-
     struct MousePosition
     {
         std::size_t x;
         std::size_t y;
 
         auto operator<=>(const MousePosition &) const = default;
-    };
-
-    struct MouseMove
-    {
-        MousePosition position;
     };
 }
