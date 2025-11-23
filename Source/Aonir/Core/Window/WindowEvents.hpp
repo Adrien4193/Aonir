@@ -4,9 +4,8 @@
 #include <string>
 #include <variant>
 
-#include <Aonir/Core/Input/Keyboard.hpp>
-#include <Aonir/Core/Input/Mouse.hpp>
-
+#include "Keyboard.hpp"
+#include "Mouse.hpp"
 #include "WindowSettings.hpp"
 
 namespace Aonir
