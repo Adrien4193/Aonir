@@ -4,12 +4,12 @@ My C++ game engine (Windows only for now).
 
 ## Requirements
 
-- [Git](https://git-scm.com/downloads).
-- [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#remote-tools-for-visual-studio-2022).
-- [CMake](https://cmake.org/download).
-- [Ninja](https://ninja-build.org).
-- [vcpkg](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started) Optional, dependencies can be provided by other means.
-- [NSIS](https://nsis.sourceforge.io/Download) Optional, only to package an installer on Windows.
+- [Git](https://git-scm.com/downloads)
+- [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#remote-tools-for-visual-studio-2022)
+- [CMake](https://cmake.org/download)
+- [Ninja](https://ninja-build.org)
+- [vcpkg](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started) (Optional, dependencies can be provided by other means)
+- [NSIS](https://nsis.sourceforge.io/Download) (Optional, only for Windows installer)
 
 ## Building
 
