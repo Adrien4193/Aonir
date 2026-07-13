@@ -7,6 +7,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 
+set(CMAKE_VERIFY_INTERFACE_HEADER_SETS ON)
+
 if(MSVC)
     add_compile_options(/W4)
 else()

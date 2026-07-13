@@ -47,11 +47,9 @@ namespace Aonir
             window.buffer.events = window.handle.poll();
 
             auto processEvent = Overload{
-                [](const WindowError &) {},
                 [&](const WindowRename &e) { window.buffer.title = e.title; },
                 [&](const WindowMove &e) { window.buffer.position = e.position; },
                 [&](const WindowResize &e) { window.buffer.size = e.size; },
-                [](const WindowClose &) {},
                 [](const auto &) {},
             };
 

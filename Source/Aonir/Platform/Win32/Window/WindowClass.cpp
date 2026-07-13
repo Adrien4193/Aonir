@@ -65,15 +65,15 @@ namespace Aonir
 
     auto Win32WindowClass::Instanciate(const WindowSettings &settings, WindowListener listener) -> Win32Window
     {
-        auto options = DWORD(0);
+        auto options = static_cast<DWORD>(0);
         auto title = ToUtf16(settings.title);
-        auto style = DWORD(WS_OVERLAPPEDWINDOW);
+        auto style = static_cast<DWORD>(WS_OVERLAPPEDWINDOW);
         auto x = static_cast<int>(settings.position.x);
         auto y = static_cast<int>(settings.position.y);
         auto width = static_cast<int>(settings.size.width);
         auto height = static_cast<int>(settings.size.height);
-        auto *parent = HWND(nullptr);
-        auto *menu = HMENU(nullptr);
+        auto *parent = static_cast<HWND>(nullptr);
+        auto *menu = static_cast<HMENU>(nullptr);
 
         auto ptr = std::make_unique<Win32WindowListener>(std::move(listener));
 

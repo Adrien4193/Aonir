@@ -1,26 +1,30 @@
 #pragma once
 
 #include <compare>
-#include <cstddef>
+#include <cstdint>
 
 namespace Aonir
 {
-    struct MouseButton
+    enum class MouseButton : std::uint8_t
     {
-        std::size_t id;
-
-        auto operator<=>(const MouseButton &) const = default;
+        Left,
+        Right,
+        Middle,
     };
-
-    constexpr auto leftMouseButton = MouseButton{0};
-    constexpr auto rightMouseButton = MouseButton{1};
-    constexpr auto middleMouseButton = MouseButton{2};
 
     struct MousePosition
     {
-        std::size_t x;
-        std::size_t y;
+        std::uint32_t x;
+        std::uint32_t y;
 
         auto operator<=>(const MousePosition &) const = default;
+    };
+
+    struct MouseScrollDelta
+    {
+        std::int32_t x;
+        std::int32_t y;
+
+        auto operator<=>(const MouseScrollDelta &) const = default;
     };
 }

@@ -1,15 +1,11 @@
 #pragma once
 
 #include <compare>
-#include <cstddef>
 #include <cstdint>
 
 namespace Aonir
 {
-    struct Key
+    enum class Key : std::uint32_t
     {
-        std::size_t id;
-
-        auto operator<=>(const Key &) const = default;
     };
 }

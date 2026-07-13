@@ -18,7 +18,7 @@ namespace
 {
     using namespace Aonir;
 
-    constexpr auto runTaskMessage = UINT(WM_USER);
+    constexpr auto runTaskMessage = static_cast<UINT>(WM_USER);
 
     auto RunTask(WPARAM wparam) -> void
     {

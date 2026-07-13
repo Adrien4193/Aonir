@@ -24,7 +24,7 @@ namespace Aonir
     struct LogEntry
     {
         std::string_view name;
-        LogLevel level = LogLevel::Info;
+        LogLevel level;
         std::string_view message;
     };
 

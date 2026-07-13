@@ -49,6 +49,11 @@ namespace Aonir
         MousePosition position;
     };
 
+    struct MouseScroll
+    {
+        MouseScrollDelta delta;
+    };
+
     struct KeyPress
     {
         Key key;
@@ -73,6 +78,7 @@ namespace Aonir
         MouseButtonPress,
         MouseButtonRelease,
         MouseMove,
+        MouseScroll,
         KeyPress,
         KeyRelease,
         TextInput>;

@@ -46,12 +46,13 @@ auto main(int argc, const char **argv) -> int
             [&](const WindowMove &e) { logger.Info("WindowMove: {} {}", e.position.x, e.position.y); },
             [&](const WindowResize &e) { logger.Info("WindowResize: {} {}", e.size.width, e.size.height); },
             [&](const WindowClose &) { closed = true; },
-            [&](const KeyPress &e) { logger.Info("KeyPress: {}", e.key.id); },
-            [&](const KeyRelease &e) { logger.Info("KeyRelease: {}", e.key.id); },
+            [&](const KeyPress &e) { logger.Info("KeyPress: {}", static_cast<int>(e.key)); },
+            [&](const KeyRelease &e) { logger.Info("KeyRelease: {}", static_cast<int>(e.key)); },
             [&](const TextInput &e) { logger.Info("Text input: {}", e.codepoint); },
-            [&](const MouseButtonPress &e) { logger.Info("MouseButtonPress: {}", e.button.id); },
-            [&](const MouseButtonRelease &e) { logger.Info("MouseButtonRelease: {}", e.button.id); },
+            [&](const MouseButtonPress &e) { logger.Info("MouseButtonPress: {}", static_cast<int>(e.button)); },
+            [&](const MouseButtonRelease &e) { logger.Info("MouseButtonRelease: {}", static_cast<int>(e.button)); },
             [&](const MouseMove &e) { logger.Info("MouseMove: {} {}", e.position.x, e.position.y); },
+            [&](const MouseScroll &e) { logger.Info("MouseScroll: {} {}", e.delta.x, e.delta.y); },
         };
 
         for (const auto &e : window.GetEvents())
