@@ -2,11 +2,17 @@
 
 #include <functional>
 #include <map>
+#include <string_view>
 
 #include "Window.hpp"
 
 namespace Aonir
 {
+    struct WindowFactorySettings
+    {
+        std::string_view className = "Aonir";
+    };
+
     using WindowFactory = std::function<auto(const WindowSettings &)->WindowHandle>;
 
     class WindowManager

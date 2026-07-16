@@ -109,10 +109,10 @@ namespace
         Win32WindowClass windowClass;
     };
 
-    auto CreateWin32WindowFactory(HINSTANCE instance) -> WindowFactory
+    auto CreateWin32WindowFactory(HINSTANCE instance, const WindowFactorySettings &settings) -> WindowFactory
     {
         auto thread = StartWin32MessageThread();
-        auto windowClass = CreateWin32WindowClass(instance, "Aonir");
+        auto windowClass = CreateWin32WindowClass(instance, settings.className);
 
         auto factory = Win32WindowFactory{
             .thread = std::move(thread),
@@ -127,9 +127,9 @@ namespace
 
 namespace Aonir
 {
-    auto CreateNativeWindowFactory() -> WindowFactory
+    auto CreateNativeWindowFactory(const WindowFactorySettings &settings) -> WindowFactory
     {
         auto *instance = GetModuleHandleW(nullptr);
-        return CreateWin32WindowFactory(instance);
+        return CreateWin32WindowFactory(instance, settings);
     }
 }
