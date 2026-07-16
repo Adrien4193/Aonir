@@ -60,9 +60,6 @@ namespace
         {
         }
 
-        WindowHolder(const WindowHolder &) = delete;
-        WindowHolder(WindowHolder &&) = delete;
-
         ~WindowHolder()
         {
             try
@@ -75,7 +72,10 @@ namespace
             }
         }
 
+        WindowHolder(const WindowHolder &) = delete;
         auto operator=(const WindowHolder &) -> WindowHolder & = delete;
+
+        WindowHolder(WindowHolder &&) = delete;
         auto operator=(WindowHolder &&) -> WindowHolder & = delete;
 
         auto GetHandle() -> Win32WindowHandle &

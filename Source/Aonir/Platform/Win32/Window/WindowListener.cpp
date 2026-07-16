@@ -1,6 +1,6 @@
 #include "WindowListener.hpp"
 
-#include <cstddef>
+#include <cstdint>
 #include <exception>
 #include <utility>
 
@@ -27,16 +27,16 @@ namespace
 
     auto OnMove(const WindowListener &listener, LPARAM lparam) -> void
     {
-        auto x = static_cast<std::size_t>(LOWORD(lparam));
-        auto y = static_cast<std::size_t>(HIWORD(lparam));
+        auto x = static_cast<std::uint32_t>(LOWORD(lparam));
+        auto y = static_cast<std::uint32_t>(HIWORD(lparam));
 
         listener(WindowMove({x, y}));
     }
 
     auto OnResize(const WindowListener &listener, LPARAM lparam) -> void
     {
-        auto width = static_cast<std::size_t>(LOWORD(lparam));
-        auto height = static_cast<std::size_t>(HIWORD(lparam));
+        auto width = static_cast<std::uint32_t>(LOWORD(lparam));
+        auto height = static_cast<std::uint32_t>(HIWORD(lparam));
 
         listener(WindowResize({width, height}));
     }

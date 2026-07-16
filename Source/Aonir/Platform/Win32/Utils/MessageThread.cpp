@@ -22,7 +22,7 @@ namespace
 
     auto RunTask(WPARAM wparam) -> void
     {
-        const auto &task = *reinterpret_cast<const TaskMessage *>(wparam); // NOLINT(performance-no-int-to-ptr)
+        const auto &task = *reinterpret_cast<const Win32MessageThread::Task *>(wparam); // NOLINT(performance-no-int-to-ptr)
         task();
     }
 
@@ -78,7 +78,7 @@ namespace Aonir
         }
     }
 
-    auto Win32MessageThread::Start(const TaskMessage &task) const -> void
+    auto Win32MessageThread::Start(const Task &task) const -> void
     {
         auto wparam = reinterpret_cast<WPARAM>(&task);
 
