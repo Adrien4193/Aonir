@@ -65,19 +65,16 @@ auto main(int argc, const char **argv) -> int
 
     window.Show();
 
-    const auto graphicsApiFactory = CreateVulkanFactory();
+    const auto extensions = GetAvailableVulkanExtensions();
+    const auto layers = GetAvailableVulkanValidationLayers();
 
-    const auto extensions = graphicsApiFactory.getAvailableExtensions();
-    const auto layers = graphicsApiFactory.getAvailableDebugLayers();
-
-    const auto test = graphicsApiFactory.createGraphicsApi({
+    const auto test = CreateVulkanGraphicsApi({
         .applicationName = "Sandbox",
         .applicationVersion = Version{.major = 1, .minor = 0, .patch = 0},
         .engineName = "Aonir",
         .engineVersion = Version{.major = 1, .minor = 0, .patch = 0},
         .extensions = {},
-        .debugLayers = {},
-        .logger = logger,
+        .layers = {},
     });
 
     (void)test;

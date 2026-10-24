@@ -17,8 +17,11 @@ namespace
     using namespace Aonir;
 
     using VulkanInstance = std::unique_ptr<VkInstance_T, decltype([](auto *x) { vkDestroyInstance(x, nullptr); })>;
+}
 
-    auto GetAvailableExtensions() -> std::vector<GraphicsApiExtension>
+namespace Aonir
+{
+    auto GetAvailableVulkanExtensions() -> std::vector<VulkanExtension>
     {
         auto extensionCount = std::uint32_t();
         auto result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
@@ -29,12 +32,12 @@ namespace
         result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableExtensions.data());
         ThrowIfVulkanError("Cannot enumerate Vulkan extensions", result);
 
-        const auto toEngine = [](const auto &x) { return GraphicsApiExtension{.name = x.extensionName, .version = x.specVersion}; };
+        const auto toEngine = [](const auto &x) { return VulkanExtension{.name = x.extensionName, .version = x.specVersion}; };
 
         return availableExtensions | std::views::transform(toEngine) | std::ranges::to<std::vector>();
     }
 
-    auto GetAvailableValidationLayers() -> std::vector<GraphicsApiDebugLayer>
+    auto GetAvailableVulkanValidationLayers() -> std::vector<VulkanValidationLayer>
     {
         auto layerCount = std::uint32_t();
 
@@ -48,7 +51,7 @@ namespace
 
         const auto toEngine = [](const auto &x)
         {
-            return GraphicsApiDebugLayer{
+            return VulkanValidationLayer{
                 .name = x.layerName,
                 .description = x.description,
                 .specificationVersion = x.specVersion,
@@ -59,7 +62,7 @@ namespace
         return availableLayers | std::views::transform(toEngine) | std::ranges::to<std::vector>();
     }
 
-    auto CreateInstance(const GraphicsApiSettings &settings) -> GraphicsApi
+    auto CreateVulkanGraphicsApi(const GraphicsApiSettings &settings) -> GraphicsApi
     {
         auto [major, minor, patch] = settings.applicationVersion;
         auto [engineMajor, engineMinor, enginePatch] = settings.engineVersion;
@@ -77,7 +80,7 @@ namespace
         const auto getName = [](const auto &x) { return x.name.c_str(); };
 
         auto extensions = settings.extensions | std::views::transform(getName) | std::ranges::to<std::vector>();
-        auto layers = settings.debugLayers | std::views::transform(getName) | std::ranges::to<std::vector>();
+        auto layers = settings.layers | std::views::transform(getName) | std::ranges::to<std::vector>();
 
         const auto instanceInfo = VkInstanceCreateInfo{
             .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
@@ -96,17 +99,5 @@ namespace
         ThrowIfVulkanError("Cannot create Vulkan instance", result);
 
         return {std::make_shared<VkInstance>(instance)};
-    }
-}
-
-namespace Aonir
-{
-    auto CreateVulkanFactory() -> GraphicsApiFactory
-    {
-        return {
-            .getAvailableExtensions = [] { return GetAvailableExtensions(); },
-            .getAvailableDebugLayers = [] { return GetAvailableValidationLayers(); },
-            .createGraphicsApi = [](const auto &x) { return CreateInstance(x); },
-        };
     }
 }
