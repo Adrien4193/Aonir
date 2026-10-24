@@ -1,4 +1,4 @@
-#include <Aonir/Platform/Window.hpp>
+#include "Window.hpp"
 
 #include <cassert>
 #include <functional>
@@ -107,7 +107,7 @@ namespace
         Win32WindowClass windowClass;
     };
 
-    auto CreateWin32WindowFactory(HINSTANCE instance, const WindowFactorySettings &settings) -> WindowFactory
+    auto CreateWindowFactory(HINSTANCE instance, const Win32WindowFactorySettings &settings) -> WindowFactory
     {
         auto thread = StartWin32MessageThread();
         auto windowClass = CreateWin32WindowClass(instance, settings.className);
@@ -125,9 +125,9 @@ namespace
 
 namespace Aonir
 {
-    auto CreateNativeWindowFactory(const WindowFactorySettings &settings) -> WindowFactory
+    auto CreateWin32WindowFactory(const Win32WindowFactorySettings &settings) -> WindowFactory
     {
         auto *instance = GetModuleHandleW(nullptr);
-        return CreateWin32WindowFactory(instance, settings);
+        return CreateWindowFactory(instance, settings);
     }
 }

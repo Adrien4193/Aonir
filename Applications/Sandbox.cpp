@@ -12,7 +12,7 @@
 #include <Aonir/Core/Window/Window.hpp>
 #include <Aonir/Core/Window/WindowManager.hpp>
 
-#include <Aonir/Platform/Window.hpp>
+#include <Aonir/Platform/Win32/Window.hpp>
 
 #include <Aonir/Vulkan/GraphicsApi.hpp>
 
@@ -53,7 +53,7 @@ auto main(int argc, const char **argv) -> int
         logger.Info("argv [{}]: {}", i, argv[i]);
     }
 
-    auto windows = WindowManager(CreateNativeWindowFactory({
+    auto windows = WindowManager(CreateWin32WindowFactory({
         .className = "Aonir",
     }));
 
