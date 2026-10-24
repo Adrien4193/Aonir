@@ -21,9 +21,9 @@ namespace Aonir
         }
 
         const auto *ptr = value.data();
-        auto size = static_cast<int>(value.size());
+        const auto size = static_cast<int>(value.size());
 
-        auto required = WideCharToMultiByte(CP_UTF8, 0, ptr, size, nullptr, 0, nullptr, nullptr);
+        const auto required = WideCharToMultiByte(CP_UTF8, 0, ptr, size, nullptr, 0, nullptr, nullptr);
 
         if (required <= 0)
         {
@@ -32,7 +32,7 @@ namespace Aonir
 
         auto result = std::string(static_cast<std::size_t>(required), '\0');
 
-        auto written = WideCharToMultiByte(CP_UTF8, 0, ptr, size, result.data(), required, nullptr, nullptr);
+        const auto written = WideCharToMultiByte(CP_UTF8, 0, ptr, size, result.data(), required, nullptr, nullptr);
 
         if (written != required)
         {
@@ -50,9 +50,9 @@ namespace Aonir
         }
 
         const auto *ptr = value.data();
-        auto size = static_cast<int>(value.size());
+        const auto size = static_cast<int>(value.size());
 
-        auto required = MultiByteToWideChar(CP_UTF8, 0, ptr, size, nullptr, 0);
+        const auto required = MultiByteToWideChar(CP_UTF8, 0, ptr, size, nullptr, 0);
 
         if (required <= 0)
         {
@@ -61,7 +61,7 @@ namespace Aonir
 
         auto result = std::wstring(static_cast<std::size_t>(required), L'\0');
 
-        auto written = MultiByteToWideChar(CP_UTF8, 0, ptr, size, result.data(), required);
+        const auto written = MultiByteToWideChar(CP_UTF8, 0, ptr, size, result.data(), required);
 
         if (written != required)
         {

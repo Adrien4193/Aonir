@@ -38,7 +38,7 @@ namespace
 
         while (true)
         {
-            auto code = GetMessageW(&message, nullptr, 0, 0);
+            const auto code = GetMessageW(&message, nullptr, 0, 0);
 
             if (code <= 0)
             {
@@ -73,16 +73,16 @@ namespace Aonir
     {
         if (m_thread.joinable())
         {
-            [[maybe_unused]] auto success = PostThreadMessageW(m_id, WM_QUIT, 0, 0);
+            [[maybe_unused]] const auto success = PostThreadMessageW(m_id, WM_QUIT, 0, 0);
             assert(success == TRUE);
         }
     }
 
     auto Win32MessageThread::Start(const Task &task) const -> void
     {
-        auto wparam = reinterpret_cast<WPARAM>(&task);
+        const auto wparam = reinterpret_cast<WPARAM>(&task);
 
-        auto success = PostThreadMessageW(m_id, runTaskMessage, wparam, 0);
+        const auto success = PostThreadMessageW(m_id, runTaskMessage, wparam, 0);
 
         if (success == FALSE)
         {
@@ -111,7 +111,7 @@ namespace Aonir
 
         future.get();
 
-        auto id = GetThreadId(thread.native_handle());
+        const auto id = GetThreadId(thread.native_handle());
 
         return Win32MessageThread(id, std::move(thread));
     }

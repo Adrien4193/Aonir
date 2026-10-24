@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <exception>
+#include <optional>
 #include <utility>
 
 #include <Windows.h> // NOLINT(misc-include-cleaner)
@@ -17,33 +18,50 @@ namespace
 {
     using namespace Aonir;
 
-    auto OnSetTitle(const WindowListener &listener, LPARAM lparam) -> void
+    struct Win32Message
+    {
+        UINT type;
+        WPARAM wparam;
+        LPARAM lparam;
+    };
+
+    auto DeserializeWindowRename(LPARAM lparam) -> WindowRename
     {
         const auto *wtitle = reinterpret_cast<const wchar_t *>(lparam); // NOLINT(performance-no-int-to-ptr)
-        auto title = ToUtf8(wtitle);
-
-        listener(WindowRename(std::move(title)));
+        return {ToUtf8(wtitle)};
     }
 
-    auto OnMove(const WindowListener &listener, LPARAM lparam) -> void
+    auto DeserializeWindowMove(LPARAM lparam) -> WindowMove
     {
         auto x = static_cast<std::uint32_t>(LOWORD(lparam));
         auto y = static_cast<std::uint32_t>(HIWORD(lparam));
 
-        listener(WindowMove({x, y}));
+        return {x, y};
     }
 
-    auto OnResize(const WindowListener &listener, LPARAM lparam) -> void
+    auto DeserializeWindowResize(LPARAM lparam) -> WindowResize
     {
         auto width = static_cast<std::uint32_t>(LOWORD(lparam));
         auto height = static_cast<std::uint32_t>(HIWORD(lparam));
 
-        listener(WindowResize({width, height}));
+        return {width, height};
     }
 
-    auto OnClose(const WindowListener &listener) -> void
+    auto DeserializeEvent(Win32Message message) -> std::optional<WindowEvent>
     {
-        listener(WindowClose());
+        switch (message.type)
+        {
+        case WM_SETTEXT:
+            return DeserializeWindowRename(message.lparam);
+        case WM_MOVE:
+            return DeserializeWindowMove(message.lparam);
+        case WM_SIZE:
+            return DeserializeWindowResize(message.lparam);
+        case WM_CLOSE:
+            return WindowClose();
+        default:
+            return std::nullopt;
+        }
     }
 }
 
@@ -58,27 +76,18 @@ namespace Aonir
     {
         try
         {
-            switch (type)
+            auto event = DeserializeEvent({.type = type, .wparam = wparam, .lparam = lparam});
+
+            if (event)
             {
-            case WM_SETTEXT:
-                OnSetTitle(m_listener, lparam);
-                break;
-            case WM_MOVE:
-                OnMove(m_listener, lparam);
+                m_listener(std::move(*event));
                 return 0;
-            case WM_SIZE:
-                OnResize(m_listener, lparam);
-                return 0;
-            case WM_CLOSE:
-                OnClose(m_listener);
-                return 0;
-            default:
-                break;
             }
         }
         catch (...)
         {
             m_listener(WindowError(std::current_exception()));
+            return 0;
         }
 
         return DefWindowProcW(window, type, wparam, lparam);

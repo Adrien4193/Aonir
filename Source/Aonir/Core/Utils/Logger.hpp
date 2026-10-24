@@ -55,8 +55,8 @@ namespace Aonir
                 return;
             }
 
-            auto message = std::format(format, std::forward<Args>(args)...);
-            auto entry = LogEntry(m_name, m_level, message);
+            const auto message = std::format(format, std::forward<Args>(args)...);
+            const auto entry = LogEntry(m_name, m_level, message);
 
             m_handler(entry);
         }

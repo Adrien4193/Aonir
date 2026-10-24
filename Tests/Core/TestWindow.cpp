@@ -27,19 +27,19 @@ namespace
 
 TEST(Window, SingleWindow) // NOLINT
 {
-    auto handle = NativeWindowHandle{nullptr};
+    const auto handle = NativeWindowHandle{nullptr};
 
-    auto settings = WindowSettings{
+    const auto settings = WindowSettings{
         .title = "Test",
         .position = {.x = 1, .y = 2},
         .size = {.width = 3, .height = 4},
     };
 
     auto buffer = CreateWindowBuffer(settings);
-    auto factory = MockWindowFactory(handle, buffer);
+    const auto factory = MockWindowFactory(handle, buffer);
     auto windows = WindowManager(factory);
 
-    auto window = windows.Add(settings);
+    const auto window = windows.Add(settings);
 
     windows.Poll();
 

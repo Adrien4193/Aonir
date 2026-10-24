@@ -36,14 +36,14 @@ namespace Aonir
     {
         auto buffer = std::array<wchar_t, 256>();
 
-        auto flags = FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
+        const auto flags = FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
         const auto *source = static_cast<LPCVOID>(nullptr);
-        auto language = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
+        const auto language = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
         auto *data = buffer.data();
-        auto size = static_cast<DWORD>(buffer.size());
+        const auto size = static_cast<DWORD>(buffer.size());
         auto *args = static_cast<va_list *>(nullptr);
 
-        auto result = FormatMessageW(flags, source, code, language, data, size, args);
+        const auto result = FormatMessageW(flags, source, code, language, data, size, args);
 
         if (result == 0)
         {
@@ -57,7 +57,7 @@ namespace Aonir
 
     auto Win32LastError(std::string_view message) -> Win32Error
     {
-        auto code = GetLastError();
+        const auto code = GetLastError();
         auto description = Win32ErrorToString(code);
         auto extended = std::format("{}: {}", message, description);
         return Win32Error(std::move(extended), code);

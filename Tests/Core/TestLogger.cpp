@@ -16,7 +16,7 @@ TEST(Logger, LevelName) // NOLINT
 
 TEST(Logger, EntryFormat) // NOLINT
 {
-    auto message = FormatLogEntry({
+    const auto message = FormatLogEntry({
         .name = "Test",
         .level = LogLevel::Debug,
         .message = "This is a test.",

@@ -37,7 +37,7 @@ namespace Aonir
             auto promise = std::promise<ResultType>();
             auto future = promise.get_future();
 
-            auto wrapper = [&]
+            const auto runTaskAndSetFuture = [&]
             {
                 try
                 {
@@ -56,6 +56,8 @@ namespace Aonir
                     promise.set_exception(std::current_exception());
                 }
             };
+
+            const auto wrapper = Task(runTaskAndSetFuture);
 
             Start(wrapper);
 

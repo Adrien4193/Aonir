@@ -36,13 +36,13 @@ namespace
     public:
         auto Add(WindowEvent event) -> void
         {
-            auto lock = std::scoped_lock(m_mutex);
+            const auto lock = std::scoped_lock(m_mutex);
             m_events.push_back(std::move(event));
         }
 
         auto Poll() -> std::vector<WindowEvent>
         {
-            auto lock = std::scoped_lock(m_mutex);
+            const auto lock = std::scoped_lock(m_mutex);
             return std::exchange(m_events, {});
         }
     };
@@ -86,12 +86,12 @@ namespace
 
     auto Instanciate(Win32MessageThread &thread, Win32WindowClass &windowClass, const WindowSettings &settings) -> WindowHandle
     {
-        auto events = std::make_shared<EventBuffer>();
+        const auto events = std::make_shared<EventBuffer>();
         auto listener = [=](auto event) { events->Add(std::move(event)); };
 
         auto window = thread.Run([&] { return windowClass.Instanciate(settings, listener); });
 
-        auto holder = std::make_shared<WindowHolder>(thread, std::move(window));
+        const auto holder = std::make_shared<WindowHolder>(thread, std::move(window));
 
         return WindowHandle{
             .native = NativeWindowHandle{holder->GetHandle().GetNativeHandle()},
@@ -119,7 +119,7 @@ namespace
             .windowClass = std::move(windowClass),
         };
 
-        auto ptr = std::make_shared<Win32WindowFactory>(std::move(factory));
+        const auto ptr = std::make_shared<Win32WindowFactory>(std::move(factory));
 
         return [=](const auto &settings) { return Instanciate(ptr->thread, ptr->windowClass, settings); };
     }
