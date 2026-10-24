@@ -91,6 +91,13 @@ namespace Aonir
     {
         const auto wname = ToUtf16(name);
 
+        auto *defaultCursor = LoadCursorW(nullptr, IDC_ARROW);
+
+        if (defaultCursor == nullptr)
+        {
+            throw Win32LastError("Failed to create default cursor for window class");
+        }
+
         const auto settings = WNDCLASSW{
             .style = 0,
             .lpfnWndProc = &ProcessMessage,
@@ -98,7 +105,7 @@ namespace Aonir
             .cbWndExtra = 0,
             .hInstance = instance,
             .hIcon = nullptr,
-            .hCursor = nullptr,
+            .hCursor = defaultCursor,
             .hbrBackground = nullptr,
             .lpszMenuName = nullptr,
             .lpszClassName = wname.c_str(),

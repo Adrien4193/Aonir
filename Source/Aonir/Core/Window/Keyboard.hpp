@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <optional>
 
+#include <Aonir/Core/Utils/Unicode.hpp>
+
 namespace Aonir
 {
     enum class VirtualKey : std::uint8_t
@@ -39,6 +41,6 @@ namespace Aonir
 
     struct KeyText
     {
-        std::uint32_t codepoint;
+        Codepoint codepoint;
     };
 }

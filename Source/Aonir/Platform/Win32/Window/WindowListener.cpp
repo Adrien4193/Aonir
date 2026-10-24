@@ -149,6 +149,7 @@ namespace Aonir
                 m_listener(KeyRelease(DeserializeKey(wparam, lparam)));
                 return 0;
             case WM_CHAR:
+                m_listener(KeyText(static_cast<Codepoint>(wparam)));
                 return 0;
             case WM_SETTEXT:
                 m_listener(DeserializeWindowRename(lparam));
