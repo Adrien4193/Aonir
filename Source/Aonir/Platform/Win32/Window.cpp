@@ -1,4 +1,4 @@
-#include <Aonir/Platform/WindowFactory.hpp>
+#include <Aonir/Platform/Window.hpp>
 
 #include <cassert>
 #include <functional>

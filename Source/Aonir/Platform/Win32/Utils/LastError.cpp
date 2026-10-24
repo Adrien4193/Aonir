@@ -21,18 +21,18 @@
 
 namespace Aonir
 {
-    Win32Error::Win32Error(std::string message, DWORD code):
+    Win32Exception::Win32Exception(std::string message, DWORD code):
         Exception(std::move(message)),
         m_code(code)
     {
     }
 
-    auto Win32Error::GetCode() const -> DWORD
+    auto Win32Exception::GetCode() const -> DWORD
     {
         return m_code;
     }
 
-    auto Win32ErrorToString(DWORD code) -> std::string
+    auto GetWin32ErrorMessage(DWORD code) -> std::string
     {
         auto buffer = std::array<wchar_t, 256>();
 
@@ -55,11 +55,11 @@ namespace Aonir
         return ToUtf8({data, length});
     }
 
-    auto Win32LastError(std::string_view message) -> Win32Error
+    auto Win32LastError(std::string_view message) -> Win32Exception
     {
         const auto code = GetLastError();
-        auto description = Win32ErrorToString(code);
+        auto description = GetWin32ErrorMessage(code);
         auto extended = std::format("{}: {}", message, description);
-        return Win32Error(std::move(extended), code);
+        return Win32Exception(std::move(extended), code);
     }
 }

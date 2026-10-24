@@ -10,6 +10,7 @@ My C++ game engine (Windows only for now).
 - [Ninja](https://ninja-build.org)
 - [vcpkg](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started) (Optional, dependencies can be provided by other means)
 - [NSIS](https://nsis.sourceforge.io/Download) (Optional, only for Windows installer)
+- [Vulkan](https://vulkan.lunarg.com/sdk/home) (Optional, only to build Vulkan renderer)
 
 ## Building
 

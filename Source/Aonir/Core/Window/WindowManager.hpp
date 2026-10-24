@@ -10,7 +10,7 @@ namespace Aonir
 {
     struct WindowFactorySettings
     {
-        std::string className = "Aonir";
+        std::string className;
     };
 
     using WindowFactory = std::function<auto(const WindowSettings &)->WindowHandle>;

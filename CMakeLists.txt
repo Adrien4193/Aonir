@@ -11,6 +11,7 @@ project(
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 option(BUILD_APPLICATIONS "Build application" ON)
 option(BUILD_TESTS "Build tests" ON)
+option(BUILD_VULKAN_RENDERER "Build Vulkan renderer" ON)
 
 list(PREPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake)
 

@@ -11,7 +11,9 @@
 #include <Aonir/Core/Window/Window.hpp>
 #include <Aonir/Core/Window/WindowManager.hpp>
 
-#include <Aonir/Platform/WindowFactory.hpp>
+#include <Aonir/Platform/Window.hpp>
+
+#include <Aonir/Vulkan/GraphicsApi.hpp>
 
 using namespace Aonir;
 
@@ -41,7 +43,7 @@ namespace std
 // NOLINTNEXTLINE(bugprone-exception-escape)
 auto main(int argc, const char **argv) -> int
 {
-    auto logger = Logger("Sandbox", LogLevel::Debug, [](const auto &record) { std::println("{}", FormatLogEntry(record)); });
+    auto logger = Logger("Sandbox", LogLevel::Debug, [](const auto &x) { std::println("{}", FormatLogEntry(x)); });
 
     logger.Info("argc: {}", argc);
 
@@ -50,7 +52,9 @@ auto main(int argc, const char **argv) -> int
         logger.Info("argv [{}]: {}", i, argv[i]);
     }
 
-    auto windows = WindowManager(CreateNativeWindowFactory());
+    auto windows = WindowManager(CreateNativeWindowFactory({
+        .className = "Aonir",
+    }));
 
     auto window = windows.Add({
         .title = "Sandbox",
@@ -59,6 +63,15 @@ auto main(int argc, const char **argv) -> int
     });
 
     window.Show();
+
+    auto test = CreateVulkanGraphicsApi({
+        .applicationName = "Sandbox",
+        .applicationVersion = Version{.major = 1, .minor = 0, .patch = 0},
+        .engineName = "Aonir",
+        .engineVersion = Version{.major = 1, .minor = 0, .patch = 0},
+    });
+
+    (void)test;
 
     auto closed = false;
 

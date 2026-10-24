@@ -11,17 +11,17 @@
 
 namespace Aonir
 {
-    class Win32Error : public Exception
+    class Win32Exception : public Exception
     {
     private:
         DWORD m_code;
 
     public:
-        explicit Win32Error(std::string message, DWORD code);
+        explicit Win32Exception(std::string message, DWORD code);
 
         [[nodiscard]] auto GetCode() const -> DWORD;
     };
 
-    auto Win32ErrorToString(DWORD code) -> std::string;
-    auto Win32LastError(std::string_view message) -> Win32Error;
+    auto GetWin32ErrorMessage(DWORD code) -> std::string;
+    auto Win32LastError(std::string_view message) -> Win32Exception;
 }

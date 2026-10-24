@@ -7,4 +7,5 @@ target_link_libraries(
     PRIVATE
     Core
     Platform
+    Vulkan
 )
