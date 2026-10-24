@@ -18,11 +18,11 @@ namespace
 {
     using namespace Aonir;
 
-    constexpr UINT RunTaskMessage = WM_USER;
+    constexpr auto runTaskMessage = static_cast<UINT>(WM_USER);
 
     auto RunTask(WPARAM wparam) -> void
     {
-        const auto &task = *reinterpret_cast<const TaskMessage *>(wparam); // NOLINT(performance-no-int-to-ptr)
+        const auto &task = *reinterpret_cast<const Win32MessageThread::Task *>(wparam); // NOLINT(performance-no-int-to-ptr)
         task();
     }
 
@@ -38,24 +38,31 @@ namespace
 
         while (true)
         {
-            auto code = GetMessageW(&message, nullptr, 0, 0);
-
-            if (code <= 0)
+            try
             {
-                return;
+                const auto code = GetMessageW(&message, nullptr, 0, 0);
+
+                if (code <= 0)
+                {
+                    return;
+                }
+
+                TranslateMessage(&message);
+
+                if (message.hwnd != nullptr)
+                {
+                    DispatchMessageW(&message);
+                    continue;
+                }
+
+                if (message.message == runTaskMessage)
+                {
+                    RunTask(message.wParam);
+                }
             }
-
-            TranslateMessage(&message);
-
-            if (message.hwnd != nullptr)
+            catch (...)
             {
-                DispatchMessageW(&message);
-                continue;
-            }
-
-            if (message.message == RunTaskMessage)
-            {
-                RunTask(message.wParam);
+                assert(false);
             }
         }
     }
@@ -73,16 +80,16 @@ namespace Aonir
     {
         if (m_thread.joinable())
         {
-            [[maybe_unused]] auto success = PostThreadMessageW(m_id, WM_QUIT, 0, 0);
+            [[maybe_unused]] const auto success = PostThreadMessageW(m_id, WM_QUIT, 0, 0);
             assert(success == TRUE);
         }
     }
 
-    auto Win32MessageThread::Start(const TaskMessage &task) const -> void
+    auto Win32MessageThread::Start(const Task &task) const -> void
     {
-        auto wparam = reinterpret_cast<WPARAM>(&task);
+        const auto wparam = reinterpret_cast<WPARAM>(&task);
 
-        auto success = PostThreadMessageW(m_id, RunTaskMessage, wparam, 0);
+        const auto success = PostThreadMessageW(m_id, runTaskMessage, wparam, 0);
 
         if (success == FALSE)
         {
@@ -97,21 +104,14 @@ namespace Aonir
 
         auto thread = std::jthread([&]
         {
-            try
-            {
-                CreateMessageQueue();
-                promise.set_value();
-                RunMessageLoop();
-            }
-            catch (...)
-            {
-                assert(false);
-            }
+            CreateMessageQueue();
+            promise.set_value();
+            RunMessageLoop();
         });
 
         future.get();
 
-        auto id = GetThreadId(thread.native_handle());
+        const auto id = GetThreadId(thread.native_handle());
 
         return Win32MessageThread(id, std::move(thread));
     }

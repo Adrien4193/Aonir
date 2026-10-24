@@ -5,7 +5,7 @@
 
 #include <Windows.h>
 
-#include <Aonir/Core/Window/WindowEvents.hpp>
+#include <Aonir/Core/Window/Window.hpp>
 
 namespace Aonir
 {

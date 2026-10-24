@@ -3,7 +3,7 @@
 namespace Aonir
 {
     template<typename... Ts>
-    struct Overload : Ts...
+    struct Overload : Ts... // NOLINT(misc-multiple-inheritance)
     {
         using Ts::operator()...;
     };

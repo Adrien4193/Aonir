@@ -7,7 +7,6 @@
 #include <Windows.h>
 
 #include <Aonir/Core/Window/Window.hpp>
-#include <Aonir/Core/Window/WindowEvents.hpp>
 
 #include "WindowHandle.hpp"
 #include "WindowListener.hpp"

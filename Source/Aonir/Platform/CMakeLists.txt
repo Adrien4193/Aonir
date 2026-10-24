@@ -9,6 +9,10 @@ file(GLOB_RECURSE SOURCES ${PLATFORM_NAME}/*.cpp ${PLATFORM_NAME}/*.hpp)
 
 add_library(Platform)
 
+if(WIN32)
+    target_compile_definitions(Platform PRIVATE UNICODE)
+endif()
+
 configure_library(Platform "${HEADERS}" "${SOURCES}")
 
 target_link_libraries(Platform PUBLIC Core)

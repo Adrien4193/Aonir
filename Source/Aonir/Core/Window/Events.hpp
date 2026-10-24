@@ -1,8 +1,8 @@
 #pragma once
 
+#include <compare>
 #include <exception>
 #include <string>
-#include <variant>
 
 namespace Aonir
 {
@@ -18,8 +18,8 @@ namespace Aonir
 
     struct WindowPosition
     {
-        std::size_t x;
-        std::size_t y;
+        std::int32_t x;
+        std::int32_t y;
 
         auto operator<=>(const WindowPosition &) const = default;
     };
@@ -31,8 +31,8 @@ namespace Aonir
 
     struct WindowSize
     {
-        std::size_t width;
-        std::size_t height;
+        std::uint32_t width;
+        std::uint32_t height;
 
         auto operator<=>(const WindowSize &) const = default;
     };
@@ -45,6 +45,4 @@ namespace Aonir
     struct WindowClose
     {
     };
-
-    using WindowEvent = std::variant<WindowError, WindowRename, WindowMove, WindowResize, WindowClose>;
 }

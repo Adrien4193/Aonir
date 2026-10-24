@@ -4,5 +4,5 @@
 
 namespace Aonir
 {
-    AONIR_PLATFORM_API auto CreateNativeWindowFactory() -> WindowFactory;
+    AONIR_PLATFORM_API auto CreateNativeWindowFactory(const WindowFactorySettings &settings = {}) -> WindowFactory;
 }

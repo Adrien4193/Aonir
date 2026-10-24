@@ -15,7 +15,6 @@
 #include <minwindef.h>
 
 #include <Aonir/Core/Window/Window.hpp>
-#include <Aonir/Core/Window/WindowEvents.hpp>
 #include <Aonir/Core/Window/WindowManager.hpp>
 
 #include <Aonir/Platform/Win32/Utils/MessageThread.hpp>
@@ -35,13 +34,13 @@ namespace
     public:
         auto Add(WindowEvent event) -> void
         {
-            auto lock = std::scoped_lock(m_mutex);
+            const auto lock = std::scoped_lock(m_mutex);
             m_events.push_back(std::move(event));
         }
 
         auto Poll() -> std::vector<WindowEvent>
         {
-            auto lock = std::scoped_lock(m_mutex);
+            const auto lock = std::scoped_lock(m_mutex);
             return std::exchange(m_events, {});
         }
     };
@@ -59,9 +58,6 @@ namespace
         {
         }
 
-        WindowHolder(const WindowHolder &) = delete;
-        WindowHolder(WindowHolder &&) = delete;
-
         ~WindowHolder()
         {
             try
@@ -74,7 +70,10 @@ namespace
             }
         }
 
+        WindowHolder(const WindowHolder &) = delete;
         auto operator=(const WindowHolder &) -> WindowHolder & = delete;
+
+        WindowHolder(WindowHolder &&) = delete;
         auto operator=(WindowHolder &&) -> WindowHolder & = delete;
 
         auto GetHandle() -> Win32WindowHandle &
@@ -85,12 +84,12 @@ namespace
 
     auto Instanciate(Win32MessageThread &thread, Win32WindowClass &windowClass, const WindowSettings &settings) -> WindowHandle
     {
-        auto events = std::make_shared<EventBuffer>();
+        const auto events = std::make_shared<EventBuffer>();
         auto listener = [=](auto event) { events->Add(std::move(event)); };
 
         auto window = thread.Run([&] { return windowClass.Instanciate(settings, listener); });
 
-        auto holder = std::make_shared<WindowHolder>(thread, std::move(window));
+        const auto holder = std::make_shared<WindowHolder>(thread, std::move(window));
 
         return WindowHandle{
             .native = NativeWindowHandle{holder->GetHandle().GetNativeHandle()},
@@ -108,17 +107,17 @@ namespace
         Win32WindowClass windowClass;
     };
 
-    auto CreateWin32WindowFactory(HINSTANCE instance) -> WindowFactory
+    auto CreateWin32WindowFactory(HINSTANCE instance, const WindowFactorySettings &settings) -> WindowFactory
     {
         auto thread = StartWin32MessageThread();
-        auto windowClass = CreateWin32WindowClass(instance, "Aonir");
+        auto windowClass = CreateWin32WindowClass(instance, settings.className);
 
         auto factory = Win32WindowFactory{
             .thread = std::move(thread),
             .windowClass = std::move(windowClass),
         };
 
-        auto ptr = std::make_shared<Win32WindowFactory>(std::move(factory));
+        const auto ptr = std::make_shared<Win32WindowFactory>(std::move(factory));
 
         return [=](const auto &settings) { return Instanciate(ptr->thread, ptr->windowClass, settings); };
     }
@@ -126,9 +125,9 @@ namespace
 
 namespace Aonir
 {
-    auto CreateNativeWindowFactory() -> WindowFactory
+    auto CreateNativeWindowFactory(const WindowFactorySettings &settings) -> WindowFactory
     {
         auto *instance = GetModuleHandleW(nullptr);
-        return CreateWin32WindowFactory(instance);
+        return CreateWin32WindowFactory(instance, settings);
     }
 }

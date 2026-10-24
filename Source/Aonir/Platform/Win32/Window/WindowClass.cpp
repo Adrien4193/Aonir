@@ -26,16 +26,16 @@ namespace
 
     auto GetListener(HWND window) -> Win32WindowListener &
     {
-        auto data = GetWindowLongPtrW(window, GWLP_USERDATA);
+        const auto data = GetWindowLongPtrW(window, GWLP_USERDATA);
         return *reinterpret_cast<Win32WindowListener *>(data); // NOLINT(performance-no-int-to-ptr)
     }
 
     auto SetListener(HWND window, LPARAM lparam) -> Win32WindowListener &
     {
-        auto &settings = *reinterpret_cast<CREATESTRUCT *>(lparam); // NOLINT(performance-no-int-to-ptr)
+        const auto &settings = *reinterpret_cast<CREATESTRUCT *>(lparam); // NOLINT(performance-no-int-to-ptr)
 
         auto *data = settings.lpCreateParams;
-        auto ptr = reinterpret_cast<LONG_PTR>(data);
+        const auto ptr = reinterpret_cast<LONG_PTR>(data);
 
         SetWindowLongPtrW(window, GWLP_USERDATA, ptr);
 
@@ -53,7 +53,7 @@ namespace Aonir
 {
     auto Win32WindowClass::Deleter::operator()(LPCWSTR className) const -> void
     {
-        [[maybe_unused]] auto success = UnregisterClassW(className, instance);
+        [[maybe_unused]] const auto success = UnregisterClassW(className, instance);
         assert(success == TRUE);
     }
 
@@ -65,15 +65,15 @@ namespace Aonir
 
     auto Win32WindowClass::Instanciate(const WindowSettings &settings, WindowListener listener) -> Win32Window
     {
-        auto options = DWORD(0);
-        auto title = ToUtf16(settings.title);
-        auto style = DWORD(WS_OVERLAPPEDWINDOW);
-        auto x = static_cast<int>(settings.position.x);
-        auto y = static_cast<int>(settings.position.y);
-        auto width = static_cast<int>(settings.size.width);
-        auto height = static_cast<int>(settings.size.height);
-        auto *parent = HWND(nullptr);
-        auto *menu = HMENU(nullptr);
+        const auto options = static_cast<DWORD>(0);
+        const auto title = ToUtf16(settings.title);
+        const auto style = static_cast<DWORD>(WS_OVERLAPPEDWINDOW);
+        const auto x = static_cast<int>(settings.position.x);
+        const auto y = static_cast<int>(settings.position.y);
+        const auto width = static_cast<int>(settings.size.width);
+        const auto height = static_cast<int>(settings.size.height);
+        auto *parent = static_cast<HWND>(nullptr);
+        auto *menu = static_cast<HMENU>(nullptr);
 
         auto ptr = std::make_unique<Win32WindowListener>(std::move(listener));
 
@@ -89,22 +89,29 @@ namespace Aonir
 
     auto CreateWin32WindowClass(HINSTANCE instance, std::string_view name) -> Win32WindowClass
     {
-        auto wname = ToUtf16(name);
+        const auto wname = ToUtf16(name);
 
-        auto settings = WNDCLASSW{
+        auto *defaultCursor = LoadCursorW(nullptr, IDC_ARROW);
+
+        if (defaultCursor == nullptr)
+        {
+            throw Win32LastError("Failed to create default cursor for window class");
+        }
+
+        const auto settings = WNDCLASSW{
             .style = 0,
             .lpfnWndProc = &ProcessMessage,
             .cbClsExtra = 0,
             .cbWndExtra = 0,
             .hInstance = instance,
             .hIcon = nullptr,
-            .hCursor = nullptr,
+            .hCursor = defaultCursor,
             .hbrBackground = nullptr,
             .lpszMenuName = nullptr,
             .lpszClassName = wname.c_str(),
         };
 
-        auto atom = RegisterClassW(&settings);
+        const auto atom = RegisterClassW(&settings);
 
         if (atom == 0)
         {

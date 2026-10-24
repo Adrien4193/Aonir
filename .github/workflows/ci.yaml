@@ -39,9 +39,9 @@ jobs:
           clangtidy: "20.1.7"
       - name: Install NSIS
         if: ${{runner.os == 'Windows'}}
-        uses: repolevedavaj/install-nsis@v1.0.3
+        uses: repolevedavaj/install-nsis@v1.2.1
         with:
-          nsis-version: "3.11"
+          nsis-version: "3.12"
       - name: Run CMake workflow
         run: cmake --workflow --preset ${{matrix.os.preset}}
   format:
