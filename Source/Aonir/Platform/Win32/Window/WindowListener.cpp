@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <exception>
+#include <optional>
 #include <utility>
 
 #include <Windows.h> // NOLINT(misc-include-cleaner)
@@ -12,6 +13,7 @@
 #include <windowsx.h>
 
 #include <Aonir/Core/Window/Events.hpp>
+#include <Aonir/Core/Window/Keyboard.hpp>
 #include <Aonir/Core/Window/Mouse.hpp>
 #include <Aonir/Platform/Win32/Utils/StringConversion.hpp>
 
@@ -36,6 +38,45 @@ namespace
         }
 
         return {delta, 0};
+    }
+
+    auto DeserializeKey(WPARAM wparam, LPARAM lparam) -> Key
+    {
+        auto virtualKey = std::optional<VirtualKey>();
+
+        switch (LOWORD(wparam))
+        {
+        case VK_LEFT:
+            virtualKey = VirtualKey::Left;
+            break;
+        case VK_RIGHT:
+            virtualKey = VirtualKey::Right;
+            break;
+        case VK_UP:
+            virtualKey = VirtualKey::Up;
+            break;
+        case VK_DOWN:
+            virtualKey = VirtualKey::Down;
+            break;
+        case VK_BACK:
+            virtualKey = VirtualKey::Back;
+            break;
+        case VK_DELETE:
+            virtualKey = VirtualKey::Delete;
+            break;
+        case VK_RETURN:
+            virtualKey = VirtualKey::Return;
+            break;
+        case VK_TAB:
+            virtualKey = VirtualKey::Tab;
+            break;
+        default:
+            break;
+        }
+
+        const auto physicalKey = static_cast<PhysicalKey>(LOBYTE(HIWORD(lparam)));
+
+        return {.virtualKey = virtualKey, .physicalKey = physicalKey};
     }
 
     auto DeserializeWindowRename(LPARAM lparam) -> WindowRename
@@ -98,6 +139,16 @@ namespace Aonir
                 return 0;
             case WM_MOUSEHWHEEL:
                 m_listener(DeserializeMouseScroll(wparam, false));
+                return 0;
+            case WM_KEYDOWN:
+            case WM_SYSKEYDOWN:
+                m_listener(KeyPress(DeserializeKey(wparam, lparam)));
+                return 0;
+            case WM_KEYUP:
+            case WM_SYSKEYUP:
+                m_listener(KeyRelease(DeserializeKey(wparam, lparam)));
+                return 0;
+            case WM_CHAR:
                 return 0;
             case WM_SETTEXT:
                 m_listener(DeserializeWindowRename(lparam));

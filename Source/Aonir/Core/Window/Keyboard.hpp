@@ -1,11 +1,30 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 
 namespace Aonir
 {
-    enum class Key : std::uint32_t
+    enum class VirtualKey : std::uint8_t
     {
+        Left,
+        Right,
+        Up,
+        Down,
+        Back,
+        Delete,
+        Return,
+        Tab,
+    };
+
+    enum class PhysicalKey : std::uint8_t
+    {
+    };
+
+    struct Key
+    {
+        std::optional<VirtualKey> virtualKey;
+        PhysicalKey physicalKey;
     };
 
     struct KeyPress
@@ -18,7 +37,7 @@ namespace Aonir
         Key key;
     };
 
-    struct TextInput
+    struct KeyText
     {
         std::uint32_t codepoint;
     };

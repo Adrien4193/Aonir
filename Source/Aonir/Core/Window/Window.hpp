@@ -39,7 +39,7 @@ namespace Aonir
         MouseScroll,
         KeyPress,
         KeyRelease,
-        TextInput>;
+        KeyText>;
 
     struct WindowHandle
     {
