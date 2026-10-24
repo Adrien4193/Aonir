@@ -10,24 +10,22 @@ namespace Aonir
         Left,
         Right,
         Middle,
-        X1,
-        X2,
     };
 
-    struct MouseButtonUp
+    struct MouseButtonPress
     {
         MouseButton button;
     };
 
-    struct MouseButtonDown
+    struct MouseButtonRelease
     {
         MouseButton button;
     };
 
     struct MousePosition
     {
-        std::uint32_t x;
-        std::uint32_t y;
+        std::int32_t x;
+        std::int32_t y;
 
         auto operator<=>(const MousePosition &) const = default;
     };

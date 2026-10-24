@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <exception>
-#include <optional>
 #include <utility>
 
 #include <Windows.h> // NOLINT(misc-include-cleaner)
@@ -10,21 +9,34 @@
 #include <WinUser.h>
 #include <minwindef.h>
 #include <windef.h>
+#include <windowsx.h>
 
 #include <Aonir/Core/Window/Events.hpp>
-#include <Aonir/Core/Window/Window.hpp>
+#include <Aonir/Core/Window/Mouse.hpp>
 #include <Aonir/Platform/Win32/Utils/StringConversion.hpp>
 
 namespace
 {
     using namespace Aonir;
 
-    struct Win32Message
+    auto DeserializeMouseMove(LPARAM lparam) -> MouseMove
     {
-        UINT type;
-        WPARAM wparam;
-        LPARAM lparam;
-    };
+        const auto x = GET_X_LPARAM(lparam);
+        const auto y = GET_Y_LPARAM(lparam);
+        return {x, y};
+    }
+
+    auto DeserializeMouseScroll(WPARAM wparam, bool vertical) -> MouseScroll
+    {
+        const auto delta = GET_WHEEL_DELTA_WPARAM(wparam);
+
+        if (vertical)
+        {
+            return {0, delta};
+        }
+
+        return {delta, 0};
+    }
 
     auto DeserializeWindowRename(LPARAM lparam) -> WindowRename
     {
@@ -34,9 +46,8 @@ namespace
 
     auto DeserializeWindowMove(LPARAM lparam) -> WindowMove
     {
-        auto x = static_cast<std::uint32_t>(LOWORD(lparam));
-        auto y = static_cast<std::uint32_t>(HIWORD(lparam));
-
+        const auto x = GET_X_LPARAM(lparam);
+        const auto y = GET_Y_LPARAM(lparam);
         return {x, y};
     }
 
@@ -44,25 +55,7 @@ namespace
     {
         auto width = static_cast<std::uint32_t>(LOWORD(lparam));
         auto height = static_cast<std::uint32_t>(HIWORD(lparam));
-
         return {width, height};
-    }
-
-    auto DeserializeEvent(Win32Message message) -> std::optional<WindowEvent>
-    {
-        switch (message.type)
-        {
-        case WM_SETTEXT:
-            return DeserializeWindowRename(message.lparam);
-        case WM_MOVE:
-            return DeserializeWindowMove(message.lparam);
-        case WM_SIZE:
-            return DeserializeWindowResize(message.lparam);
-        case WM_CLOSE:
-            return WindowClose();
-        default:
-            return std::nullopt;
-        }
     }
 }
 
@@ -77,18 +70,54 @@ namespace Aonir
     {
         try
         {
-            auto event = DeserializeEvent({.type = type, .wparam = wparam, .lparam = lparam});
-
-            if (event)
+            switch (type)
             {
-                m_listener(std::move(*event));
+            case WM_MOUSEMOVE:
+                m_listener(DeserializeMouseMove(lparam));
                 return 0;
+            case WM_LBUTTONDOWN:
+                m_listener(MouseButtonPress(MouseButton::Left));
+                return 0;
+            case WM_LBUTTONUP:
+                m_listener(MouseButtonRelease(MouseButton::Left));
+                return 0;
+            case WM_RBUTTONDOWN:
+                m_listener(MouseButtonPress(MouseButton::Right));
+                return 0;
+            case WM_RBUTTONUP:
+                m_listener(MouseButtonRelease(MouseButton::Right));
+                return 0;
+            case WM_MBUTTONDOWN:
+                m_listener(MouseButtonPress(MouseButton::Middle));
+                return 0;
+            case WM_MBUTTONUP:
+                m_listener(MouseButtonRelease(MouseButton::Middle));
+                return 0;
+            case WM_MOUSEWHEEL:
+                m_listener(DeserializeMouseScroll(wparam, true));
+                return 0;
+            case WM_MOUSEHWHEEL:
+                m_listener(DeserializeMouseScroll(wparam, false));
+                return 0;
+            case WM_SETTEXT:
+                m_listener(DeserializeWindowRename(lparam));
+                break;
+            case WM_MOVE:
+                m_listener(DeserializeWindowMove(lparam));
+                return 0;
+            case WM_SIZE:
+                m_listener(DeserializeWindowResize(lparam));
+                return 0;
+            case WM_CLOSE:
+                m_listener(WindowClose());
+                return 0;
+            default:
+                break;
             }
         }
         catch (...)
         {
             m_listener(WindowError(std::current_exception()));
-            return 0;
         }
 
         return DefWindowProcW(window, type, wparam, lparam);

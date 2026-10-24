@@ -18,8 +18,8 @@ namespace Aonir
 
     struct WindowPosition
     {
-        std::uint32_t x;
-        std::uint32_t y;
+        std::int32_t x;
+        std::int32_t y;
 
         auto operator<=>(const WindowPosition &) const = default;
     };

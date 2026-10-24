@@ -33,12 +33,12 @@ namespace Aonir
         WindowMove,
         WindowResize,
         WindowClose,
-        MouseButtonUp,
-        MouseButtonDown,
+        MouseButtonPress,
+        MouseButtonRelease,
         MouseMove,
         MouseScroll,
-        KeyUp,
-        KeyDown,
+        KeyPress,
+        KeyRelease,
         TextInput>;
 
     struct WindowHandle

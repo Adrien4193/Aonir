@@ -8,12 +8,12 @@ namespace Aonir
     {
     };
 
-    struct KeyUp
+    struct KeyPress
     {
         Key key;
     };
 
-    struct KeyDown
+    struct KeyRelease
     {
         Key key;
     };
