@@ -12,9 +12,11 @@
 #include <windef.h>
 #include <windowsx.h>
 
+#include <Aonir/Core/Utils/Unicode.hpp>
 #include <Aonir/Core/Window/Events.hpp>
 #include <Aonir/Core/Window/Keyboard.hpp>
 #include <Aonir/Core/Window/Mouse.hpp>
+
 #include <Aonir/Platform/Win32/Utils/StringConversion.hpp>
 
 namespace

@@ -11,6 +11,8 @@ namespace Aonir
     };
 }
 
+// NOLINTBEGIN(readability-identifier-naming)
+
 namespace std
 {
     template<>
@@ -27,3 +29,5 @@ namespace std
         }
     };
 }
+
+// NOLINTEND(readability-identifier-naming)
