@@ -4,8 +4,7 @@
 #include <string_view>
 #include <vector>
 
-#include "WindowEvents.hpp"
-#include "WindowSettings.hpp"
+#include "Events.hpp"
 
 namespace Aonir
 {

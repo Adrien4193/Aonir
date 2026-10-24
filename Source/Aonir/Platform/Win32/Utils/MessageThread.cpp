@@ -38,24 +38,31 @@ namespace
 
         while (true)
         {
-            const auto code = GetMessageW(&message, nullptr, 0, 0);
-
-            if (code <= 0)
+            try
             {
-                return;
+                const auto code = GetMessageW(&message, nullptr, 0, 0);
+
+                if (code <= 0)
+                {
+                    return;
+                }
+
+                TranslateMessage(&message);
+
+                if (message.hwnd != nullptr)
+                {
+                    DispatchMessageW(&message);
+                    continue;
+                }
+
+                if (message.message == runTaskMessage)
+                {
+                    RunTask(message.wParam);
+                }
             }
-
-            TranslateMessage(&message);
-
-            if (message.hwnd != nullptr)
+            catch (...)
             {
-                DispatchMessageW(&message);
-                continue;
-            }
-
-            if (message.message == runTaskMessage)
-            {
-                RunTask(message.wParam);
+                assert(false);
             }
         }
     }
@@ -97,16 +104,9 @@ namespace Aonir
 
         auto thread = std::jthread([&]
         {
-            try
-            {
-                CreateMessageQueue();
-                promise.set_value();
-                RunMessageLoop();
-            }
-            catch (...)
-            {
-                assert(false);
-            }
+            CreateMessageQueue();
+            promise.set_value();
+            RunMessageLoop();
         });
 
         future.get();

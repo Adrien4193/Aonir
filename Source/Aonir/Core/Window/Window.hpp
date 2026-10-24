@@ -4,19 +4,42 @@
 #include <functional>
 #include <string>
 #include <string_view>
+#include <variant>
 #include <vector>
 
-#include "WindowEvents.hpp"
-#include "WindowSettings.hpp"
+#include "Events.hpp"
+#include "Keyboard.hpp"
+#include "Mouse.hpp"
 
 namespace Aonir
 {
+    struct WindowSettings
+    {
+        std::string title;
+        WindowPosition position;
+        WindowSize size;
+    };
+
     struct NativeWindowHandle
     {
         void *ptr;
 
         auto operator<=>(const NativeWindowHandle &) const = default;
     };
+
+    using WindowEvent = std::variant<
+        WindowError,
+        WindowRename,
+        WindowMove,
+        WindowResize,
+        WindowClose,
+        MouseButtonUp,
+        MouseButtonDown,
+        MouseMove,
+        MouseScroll,
+        KeyUp,
+        KeyDown,
+        TextInput>;
 
     struct WindowHandle
     {

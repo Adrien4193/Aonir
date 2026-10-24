@@ -2,7 +2,7 @@
 
 #include <functional>
 #include <map>
-#include <string_view>
+#include <string>
 
 #include "Window.hpp"
 
@@ -10,7 +10,7 @@ namespace Aonir
 {
     struct WindowFactorySettings
     {
-        std::string_view className = "Aonir";
+        std::string className = "Aonir";
     };
 
     using WindowFactory = std::function<auto(const WindowSettings &)->WindowHandle>;

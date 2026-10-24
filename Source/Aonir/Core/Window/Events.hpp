@@ -1,17 +1,32 @@
 #pragma once
 
 #include <compare>
-#include <cstdint>
+#include <exception>
 #include <string>
 
 namespace Aonir
 {
+    struct WindowError
+    {
+        std::exception_ptr exception;
+    };
+
+    struct WindowRename
+    {
+        std::string title;
+    };
+
     struct WindowPosition
     {
         std::uint32_t x;
         std::uint32_t y;
 
         auto operator<=>(const WindowPosition &) const = default;
+    };
+
+    struct WindowMove
+    {
+        WindowPosition position;
     };
 
     struct WindowSize
@@ -22,10 +37,12 @@ namespace Aonir
         auto operator<=>(const WindowSize &) const = default;
     };
 
-    struct WindowSettings
+    struct WindowResize
     {
-        std::string title;
-        WindowPosition position;
         WindowSize size;
+    };
+
+    struct WindowClose
+    {
     };
 }

@@ -3,7 +3,10 @@
 
 #include <Aonir/Core/Utils/Logger.hpp>
 #include <Aonir/Core/Utils/Overload.hpp>
-#include <Aonir/Core/Window/WindowEvents.hpp>
+#include <Aonir/Core/Window/Events.hpp>
+#include <Aonir/Core/Window/Keyboard.hpp>
+#include <Aonir/Core/Window/Mouse.hpp>
+#include <Aonir/Core/Window/Window.hpp>
 #include <Aonir/Core/Window/WindowManager.hpp>
 
 #include <Aonir/Platform/WindowFactory.hpp>
@@ -46,11 +49,11 @@ auto main(int argc, const char **argv) -> int
             [&](const WindowMove &e) { logger.Info("WindowMove: {} {}", e.position.x, e.position.y); },
             [&](const WindowResize &e) { logger.Info("WindowResize: {} {}", e.size.width, e.size.height); },
             [&](const WindowClose &) { closed = true; },
-            [&](const KeyPress &e) { logger.Info("KeyPress: {}", static_cast<int>(e.key)); },
-            [&](const KeyRelease &e) { logger.Info("KeyRelease: {}", static_cast<int>(e.key)); },
+            [&](const KeyUp &e) { logger.Info("KeyUp: {}", static_cast<int>(e.key)); },
+            [&](const KeyDown &e) { logger.Info("KeyDown: {}", static_cast<int>(e.key)); },
             [&](const TextInput &e) { logger.Info("Text input: {}", e.codepoint); },
-            [&](const MouseButtonPress &e) { logger.Info("MouseButtonPress: {}", static_cast<int>(e.button)); },
-            [&](const MouseButtonRelease &e) { logger.Info("MouseButtonRelease: {}", static_cast<int>(e.button)); },
+            [&](const MouseButtonUp &e) { logger.Info("MouseButtonUp: {}", static_cast<int>(e.button)); },
+            [&](const MouseButtonDown &e) { logger.Info("MouseButtonDown: {}", static_cast<int>(e.button)); },
             [&](const MouseMove &e) { logger.Info("MouseMove: {} {}", e.position.x, e.position.y); },
             [&](const MouseScroll &e) { logger.Info("MouseScroll: {} {}", e.delta.x, e.delta.y); },
         };
