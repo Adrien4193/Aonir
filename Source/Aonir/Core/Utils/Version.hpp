@@ -6,8 +6,10 @@ namespace Aonir
 {
     struct Version
     {
-        std::uint8_t major;
-        std::uint8_t minor;
-        std::uint8_t patch;
+        std::uint32_t major;
+        std::uint32_t minor;
+        std::uint32_t patch;
     };
+
+    using VersionNumber = std::uint32_t;
 }

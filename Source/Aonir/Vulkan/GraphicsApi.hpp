@@ -4,5 +4,5 @@
 
 namespace Aonir
 {
-    AONIR_VULKAN_API auto CreateVulkanGraphicsApi(const GraphicsApiSettings &settings) -> GraphicsApi;
+    AONIR_VULKAN_API auto CreateVulkanFactory() -> GraphicsApiFactory;
 }

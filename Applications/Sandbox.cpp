@@ -5,6 +5,7 @@
 
 #include <Aonir/Core/Utils/Logger.hpp>
 #include <Aonir/Core/Utils/Overload.hpp>
+#include <Aonir/Core/Utils/Version.hpp>
 #include <Aonir/Core/Window/Events.hpp>
 #include <Aonir/Core/Window/Keyboard.hpp>
 #include <Aonir/Core/Window/Mouse.hpp>
@@ -64,11 +65,19 @@ auto main(int argc, const char **argv) -> int
 
     window.Show();
 
-    auto test = CreateVulkanGraphicsApi({
+    const auto graphicsApiFactory = CreateVulkanFactory();
+
+    const auto extensions = graphicsApiFactory.getAvailableExtensions();
+    const auto layers = graphicsApiFactory.getAvailableDebugLayers();
+
+    const auto test = graphicsApiFactory.createGraphicsApi({
         .applicationName = "Sandbox",
         .applicationVersion = Version{.major = 1, .minor = 0, .patch = 0},
         .engineName = "Aonir",
         .engineVersion = Version{.major = 1, .minor = 0, .patch = 0},
+        .extensions = {},
+        .debugLayers = {},
+        .logger = logger,
     });
 
     (void)test;
