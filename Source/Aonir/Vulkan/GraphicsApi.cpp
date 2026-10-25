@@ -172,6 +172,25 @@ namespace
         }
     }
 
+    auto TryGetPhysicalDeviceProperties(VkPhysicalDevice device) -> std::optional<PhysicalDevice>
+    {
+        auto properties = VkPhysicalDeviceProperties();
+        vkGetPhysicalDeviceProperties(device, &properties);
+
+        auto type = GetPhysicalDeviceType(properties.deviceType);
+
+        if (!type)
+        {
+            return std::nullopt;
+        }
+
+        return PhysicalDevice{
+            .nativeHandle = NativePhysicalDeviceHandle(device),
+            .name = properties.deviceName,
+            .type = *type,
+        };
+    }
+
     auto GetAvailablePhysicalDevices(VkInstance instance) -> std::vector<PhysicalDevice>
     {
         auto deviceCount = std::uint32_t();
@@ -184,19 +203,11 @@ namespace
         result = vkEnumeratePhysicalDevices(instance, &deviceCount, availableDevices.data());
         ThrowIfVulkanError("Cannot enumerate Vulkan physical devices", result);
 
-        const auto toEngine = [](auto *x)
-        {
-            auto properties = VkPhysicalDeviceProperties();
-            vkGetPhysicalDeviceProperties(x, &properties);
+        const auto tryGet = std::views::transform([](auto *x) { return TryGetPhysicalDeviceProperties(x); });
+        const auto ifSupported = std::views::filter([](const auto &x) { return x.has_value(); });
+        const auto andGet = std::views::transform([](auto &&x) { return std::move(*x); });
 
-            return PhysicalDevice{
-                .nativeHandle = NativePhysicalDeviceHandle(x),
-                .name = properties.deviceName,
-                .type = GetPhysicalDeviceType(properties.deviceType),
-            };
-        };
-
-        return availableDevices | std::views::transform(toEngine) | std::ranges::to<std::vector>();
+        return availableDevices | tryGet | ifSupported | andGet | std::ranges::to<std::vector>();
     }
 
     struct VulkanApi

@@ -3,7 +3,6 @@
 #include <compare>
 #include <cstdint>
 #include <functional>
-#include <optional>
 #include <string>
 
 namespace Aonir
@@ -27,7 +26,7 @@ namespace Aonir
     {
         NativePhysicalDeviceHandle nativeHandle;
         std::string name;
-        std::optional<PhysicalDeviceType> type;
+        PhysicalDeviceType type;
     };
 
     struct DeviceSettings
