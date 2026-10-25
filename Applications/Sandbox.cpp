@@ -66,7 +66,7 @@ auto main(int argc, const char **argv) -> int
     const auto extensions = GetAvailableVulkanExtensions();
     const auto layers = GetAvailableVulkanValidationLayers();
 
-    const auto test = CreateVulkanGraphicsApi({
+    const auto api = CreateVulkanGraphicsApi({
         .applicationName = "Sandbox",
         .applicationVersion = Version{.major = 1, .minor = 0, .patch = 0},
         .engineName = "Aonir",
@@ -76,7 +76,9 @@ auto main(int argc, const char **argv) -> int
         .logger = &logger,
     });
 
-    (void)test;
+    const auto physicalDevices = api.getAvailablePhysicalDevices();
+
+    (void)physicalDevices;
 
     auto closed = false;
 

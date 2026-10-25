@@ -3,15 +3,17 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <ranges>
-#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include <vulkan/vk_platform.h>
 #include <vulkan/vulkan_core.h>
 
+#include <Aonir/Core/Renderer/Device.hpp>
 #include <Aonir/Core/Renderer/GraphicsApi.hpp>
+#include <Aonir/Core/Utils/Exception.hpp>
 #include <Aonir/Core/Utils/Flags.hpp>
 #include <Aonir/Core/Utils/Logger.hpp>
 
@@ -126,7 +128,7 @@ namespace
 
         if (createMessenger == nullptr || destroyMessenger == nullptr)
         {
-            throw std::runtime_error("Vulkan debug extension must be enabled to use a custom logger");
+            throw Exception("Vulkan debug extension must be enabled to use a custom logger");
         }
 
         const auto debugCreateInfo = VkDebugUtilsMessengerCreateInfoEXT{
@@ -150,7 +152,51 @@ namespace
         const auto result = createMessenger(instance, &debugCreateInfo, nullptr, &messenger);
         ThrowIfVulkanError("Cannot create Vulkan debug messenger", result);
 
-        return VulkanDebugMessenger{messenger, {.instance = instance, .destroyMessenger = destroyMessenger}};
+        return {messenger, {.instance = instance, .destroyMessenger = destroyMessenger}};
+    }
+
+    auto GetPhysicalDeviceType(VkPhysicalDeviceType type) -> std::optional<PhysicalDeviceType>
+    {
+        switch (type)
+        {
+        case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
+            return PhysicalDeviceType::IntegratedGpu;
+        case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
+            return PhysicalDeviceType::DiscreteGpu;
+        case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+            return PhysicalDeviceType::VirtualGpu;
+        case VK_PHYSICAL_DEVICE_TYPE_CPU:
+            return PhysicalDeviceType::Cpu;
+        default:
+            return std::nullopt;
+        }
+    }
+
+    auto GetAvailablePhysicalDevices(VkInstance instance) -> std::vector<PhysicalDevice>
+    {
+        auto deviceCount = std::uint32_t();
+
+        auto result = vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+        ThrowIfVulkanError("Cannot get number of Vulkan physical devices", result);
+
+        auto availableDevices = std::vector<VkPhysicalDevice>(static_cast<std::size_t>(deviceCount));
+
+        result = vkEnumeratePhysicalDevices(instance, &deviceCount, availableDevices.data());
+        ThrowIfVulkanError("Cannot enumerate Vulkan physical devices", result);
+
+        const auto toEngine = [](auto *x)
+        {
+            auto properties = VkPhysicalDeviceProperties();
+            vkGetPhysicalDeviceProperties(x, &properties);
+
+            return PhysicalDevice{
+                .nativeHandle = NativePhysicalDeviceHandle(x),
+                .name = properties.deviceName,
+                .type = GetPhysicalDeviceType(properties.deviceType),
+            };
+        };
+
+        return availableDevices | std::views::transform(toEngine) | std::ranges::to<std::vector>();
     }
 
     struct VulkanApi
@@ -225,7 +271,11 @@ namespace Aonir
         }
 
         auto api = VulkanApi{.instance = std::move(instance), .messenger = std::move(messenger)};
+        const auto ptr = std::make_shared<VulkanApi>(std::move(api));
 
-        return {std::make_shared<VulkanApi>(std::move(api))};
+        return {
+            .nativeHandle = NativeGraphicsApiHandle(ptr->instance.get()),
+            .getAvailablePhysicalDevices = [=] { return GetAvailablePhysicalDevices(ptr->instance.get()); },
+        };
     }
 }
