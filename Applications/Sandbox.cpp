@@ -12,7 +12,7 @@
 #include <Aonir/Core/Window/Window.hpp>
 #include <Aonir/Core/Window/WindowManager.hpp>
 
-#include <Aonir/Platform/Win32/Window.hpp>
+#include <Aonir/Platform/Win32/Window/WindowFactory.hpp>
 
 #include <Aonir/Vulkan/GraphicsApi.hpp>
 

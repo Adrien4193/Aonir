@@ -1,4 +1,4 @@
-#include "Window.hpp"
+#include "WindowFactory.hpp"
 
 #include <cassert>
 #include <functional>
