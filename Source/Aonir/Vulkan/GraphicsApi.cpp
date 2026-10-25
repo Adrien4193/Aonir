@@ -62,7 +62,7 @@ namespace Aonir
         return availableLayers | std::views::transform(toEngine) | std::ranges::to<std::vector>();
     }
 
-    auto CreateVulkanGraphicsApi(const GraphicsApiSettings &settings) -> GraphicsApi
+    auto CreateVulkanGraphicsApi(const VulkanSettings &settings) -> GraphicsApi
     {
         auto [major, minor, patch] = settings.applicationVersion;
         auto [engineMajor, engineMinor, enginePatch] = settings.engineVersion;

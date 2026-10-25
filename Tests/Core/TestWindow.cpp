@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <Aonir/Core/Window/Events.hpp>
 #include <Aonir/Core/Window/Window.hpp>
+#include <Aonir/Core/Window/WindowEvent.hpp>
 #include <Aonir/Core/Window/WindowManager.hpp>
 
 using namespace Aonir;

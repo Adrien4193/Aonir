@@ -10,6 +10,4 @@ namespace Aonir
         std::uint32_t minor;
         std::uint32_t patch;
     };
-
-    using VersionNumber = std::uint32_t;
 }

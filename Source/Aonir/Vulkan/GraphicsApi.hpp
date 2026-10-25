@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -11,18 +12,18 @@ namespace Aonir
     struct VulkanExtension
     {
         std::string name;
-        VersionNumber version;
+        std::uint32_t version;
     };
 
     struct VulkanValidationLayer
     {
         std::string name;
         std::string description;
-        VersionNumber specificationVersion;
-        VersionNumber implementationVersion;
+        std::uint32_t specificationVersion;
+        std::uint32_t implementationVersion;
     };
 
-    struct GraphicsApiSettings
+    struct VulkanSettings
     {
         std::string applicationName;
         Version applicationVersion;
@@ -34,5 +35,5 @@ namespace Aonir
 
     AONIR_VULKAN_API auto GetAvailableVulkanExtensions() -> std::vector<VulkanExtension>;
     AONIR_VULKAN_API auto GetAvailableVulkanValidationLayers() -> std::vector<VulkanValidationLayer>;
-    AONIR_VULKAN_API auto CreateVulkanGraphicsApi(const GraphicsApiSettings &settings) -> GraphicsApi;
+    AONIR_VULKAN_API auto CreateVulkanGraphicsApi(const VulkanSettings &settings) -> GraphicsApi;
 }

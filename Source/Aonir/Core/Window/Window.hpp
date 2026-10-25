@@ -7,9 +7,7 @@
 #include <variant>
 #include <vector>
 
-#include "Events.hpp"
-#include "Keyboard.hpp"
-#include "Mouse.hpp"
+#include "WindowEvent.hpp"
 
 namespace Aonir
 {
@@ -26,20 +24,6 @@ namespace Aonir
 
         auto operator<=>(const NativeWindowHandle &) const = default;
     };
-
-    using WindowEvent = std::variant<
-        WindowError,
-        WindowRename,
-        WindowMove,
-        WindowResize,
-        WindowClose,
-        MouseButtonPress,
-        MouseButtonRelease,
-        MouseMove,
-        MouseScroll,
-        KeyPress,
-        KeyRelease,
-        KeyText>;
 
     struct WindowHandle
     {

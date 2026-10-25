@@ -6,10 +6,8 @@
 #include <Aonir/Core/Utils/Logger.hpp>
 #include <Aonir/Core/Utils/Overload.hpp>
 #include <Aonir/Core/Utils/Version.hpp>
-#include <Aonir/Core/Window/Events.hpp>
-#include <Aonir/Core/Window/Keyboard.hpp>
-#include <Aonir/Core/Window/Mouse.hpp>
 #include <Aonir/Core/Window/Window.hpp>
+#include <Aonir/Core/Window/WindowEvent.hpp>
 #include <Aonir/Core/Window/WindowManager.hpp>
 
 #include <Aonir/Platform/Win32/Window/WindowFactory.hpp>

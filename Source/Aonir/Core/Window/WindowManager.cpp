@@ -7,8 +7,8 @@
 
 #include <Aonir/Core/Utils/Overload.hpp>
 
-#include "Events.hpp"
 #include "Window.hpp"
+#include "WindowEvent.hpp"
 
 namespace Aonir
 {

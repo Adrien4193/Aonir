@@ -15,6 +15,7 @@
 #include <minwindef.h>
 
 #include <Aonir/Core/Window/Window.hpp>
+#include <Aonir/Core/Window/WindowEvent.hpp>
 #include <Aonir/Core/Window/WindowManager.hpp>
 
 #include <Aonir/Platform/Win32/Utils/MessageThread.hpp>
