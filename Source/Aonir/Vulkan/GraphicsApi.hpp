@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <Aonir/Core/Renderer/GraphicsApi.hpp>
+#include <Aonir/Core/Utils/Logger.hpp>
 #include <Aonir/Core/Utils/Version.hpp>
 
 namespace Aonir
@@ -29,10 +30,13 @@ namespace Aonir
         Version applicationVersion;
         std::string engineName;
         Version engineVersion;
-        std::vector<VulkanExtension> extensions;
-        std::vector<VulkanValidationLayer> layers;
+        std::vector<std::string> extensions;
+        std::vector<std::string> validationLayers;
+        Logger *logger;
     };
 
+    AONIR_VULKAN_API auto GetVulkanDebugExtensionName() -> const char *;
+    AONIR_VULKAN_API auto GetKhronosVulkanValidationLayerName() -> const char *;
     AONIR_VULKAN_API auto GetAvailableVulkanExtensions() -> std::vector<VulkanExtension>;
     AONIR_VULKAN_API auto GetAvailableVulkanValidationLayers() -> std::vector<VulkanValidationLayer>;
     AONIR_VULKAN_API auto CreateVulkanGraphicsApi(const VulkanSettings &settings) -> GraphicsApi;

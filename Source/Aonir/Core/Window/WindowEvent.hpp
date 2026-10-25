@@ -4,6 +4,7 @@
 #include <exception>
 #include <optional>
 #include <string>
+#include <variant>
 
 #include <Aonir/Core/Utils/Unicode.hpp>
 

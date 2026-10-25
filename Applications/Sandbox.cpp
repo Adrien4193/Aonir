@@ -71,8 +71,9 @@ auto main(int argc, const char **argv) -> int
         .applicationVersion = Version{.major = 1, .minor = 0, .patch = 0},
         .engineName = "Aonir",
         .engineVersion = Version{.major = 1, .minor = 0, .patch = 0},
-        .extensions = {},
-        .layers = {},
+        .extensions = {GetVulkanDebugExtensionName()},
+        .validationLayers = {GetKhronosVulkanValidationLayerName()},
+        .logger = &logger,
     });
 
     (void)test;

@@ -4,11 +4,16 @@
 #include <cstdint>
 #include <memory>
 #include <ranges>
+#include <stdexcept>
+#include <utility>
 #include <vector>
 
+#include <vulkan/vk_platform.h>
 #include <vulkan/vulkan_core.h>
 
 #include <Aonir/Core/Renderer/GraphicsApi.hpp>
+#include <Aonir/Core/Utils/Flags.hpp>
+#include <Aonir/Core/Utils/Logger.hpp>
 
 #include "Utils.hpp"
 
@@ -17,13 +22,160 @@ namespace
     using namespace Aonir;
 
     using VulkanInstance = std::unique_ptr<VkInstance_T, decltype([](auto *x) { vkDestroyInstance(x, nullptr); })>;
+
+    auto CreateVulkanInstance(const VulkanSettings &settings) -> VulkanInstance
+    {
+        auto [major, minor, patch] = settings.applicationVersion;
+        auto [engineMajor, engineMinor, enginePatch] = settings.engineVersion;
+
+        const auto applicationInfo = VkApplicationInfo{
+            .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
+            .pNext = nullptr,
+            .pApplicationName = settings.applicationName.c_str(),
+            .applicationVersion = VK_MAKE_VERSION(major, minor, patch),
+            .pEngineName = settings.engineName.c_str(),
+            .engineVersion = VK_MAKE_VERSION(engineMajor, engineMinor, enginePatch),
+            .apiVersion = VK_API_VERSION_1_4,
+        };
+
+        const auto toCString = [](const auto &x) { return x.c_str(); };
+
+        auto extensions = settings.extensions | std::views::transform(toCString) | std::ranges::to<std::vector>();
+        auto layers = settings.validationLayers | std::views::transform(toCString) | std::ranges::to<std::vector>();
+
+        const auto instanceInfo = VkInstanceCreateInfo{
+            .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .pApplicationInfo = &applicationInfo,
+            .enabledLayerCount = static_cast<std::uint32_t>(layers.size()),
+            .ppEnabledLayerNames = layers.data(),
+            .enabledExtensionCount = static_cast<std::uint32_t>(extensions.size()),
+            .ppEnabledExtensionNames = extensions.data(),
+        };
+
+        auto *instance = VkInstance();
+
+        const auto result = vkCreateInstance(&instanceInfo, nullptr, &instance);
+        ThrowIfVulkanError("Cannot create Vulkan instance", result);
+
+        return VulkanInstance{instance};
+    }
+
+    struct VulkanDebugMessengerDeleter
+    {
+        VkInstance instance;
+        PFN_vkDestroyDebugUtilsMessengerEXT destroyMessenger;
+
+        auto operator()(VkDebugUtilsMessengerEXT messenger) const
+        {
+            destroyMessenger(instance, messenger, nullptr);
+        }
+    };
+
+    using VulkanDebugMessenger = std::unique_ptr<VkDebugUtilsMessengerEXT_T, VulkanDebugMessengerDeleter>;
+
+    auto GetLogLevel(VkDebugUtilsMessageSeverityFlagBitsEXT severity) -> LogLevel
+    {
+        if (HasFlag(severity, VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT))
+        {
+            return LogLevel::Error;
+        }
+
+        if (HasFlag(severity, VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT))
+        {
+            return LogLevel::Warn;
+        }
+
+        if (HasFlag(severity, VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT))
+        {
+            return LogLevel::Info;
+        }
+
+        if (HasFlag(severity, VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT))
+        {
+            return LogLevel::Trace;
+        }
+
+        return LogLevel::Off;
+    }
+
+    VKAPI_ATTR auto VKAPI_CALL LoggerCallback(
+        VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+        VkDebugUtilsMessageTypeFlagsEXT type,
+        const VkDebugUtilsMessengerCallbackDataEXT *callbackData,
+        void *userData) -> VkBool32
+    {
+        auto &logger = *static_cast<Logger *>(userData);
+
+        const auto level = GetLogLevel(severity);
+        (void)type;
+
+        logger.Log(level, "{}", callbackData->pMessage);
+
+        return VK_FALSE;
+    }
+
+    auto CreateDebugMessenger(VkInstance instance, Logger &logger) -> VulkanDebugMessenger
+    {
+        auto createMessenger =
+            reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
+
+        auto destroyMessenger =
+            reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
+
+        if (createMessenger == nullptr || destroyMessenger == nullptr)
+        {
+            throw std::runtime_error("Vulkan debug extension must be enabled to use a custom logger");
+        }
+
+        const auto debugCreateInfo = VkDebugUtilsMessengerCreateInfoEXT{
+            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+            .messageSeverity = CombineFlags(
+                VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT,
+                VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT,
+                VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT,
+                VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT),
+            .messageType = CombineFlags(
+                VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT,
+                VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT,
+                VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+                VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT),
+            .pfnUserCallback = LoggerCallback,
+            .pUserData = &logger,
+        };
+
+        auto *messenger = VkDebugUtilsMessengerEXT();
+
+        const auto result = createMessenger(instance, &debugCreateInfo, nullptr, &messenger);
+        ThrowIfVulkanError("Cannot create Vulkan debug messenger", result);
+
+        return VulkanDebugMessenger{messenger, {.instance = instance, .destroyMessenger = destroyMessenger}};
+    }
+
+    struct VulkanApi
+    {
+        VulkanInstance instance;
+        VulkanDebugMessenger messenger;
+    };
 }
 
 namespace Aonir
 {
+    auto GetVulkanDebugExtensionName() -> const char *
+    {
+        return VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+    }
+
+    auto GetKhronosVulkanValidationLayerName() -> const char *
+    {
+        return "VK_LAYER_KHRONOS_validation";
+    }
+
     auto GetAvailableVulkanExtensions() -> std::vector<VulkanExtension>
     {
         auto extensionCount = std::uint32_t();
+
         auto result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
         ThrowIfVulkanError("Cannot get number of Vulkan extensions", result);
 
@@ -64,40 +216,16 @@ namespace Aonir
 
     auto CreateVulkanGraphicsApi(const VulkanSettings &settings) -> GraphicsApi
     {
-        auto [major, minor, patch] = settings.applicationVersion;
-        auto [engineMajor, engineMinor, enginePatch] = settings.engineVersion;
+        auto instance = CreateVulkanInstance(settings);
+        auto messenger = VulkanDebugMessenger();
 
-        const auto applicationInfo = VkApplicationInfo{
-            .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-            .pNext = nullptr,
-            .pApplicationName = settings.applicationName.c_str(),
-            .applicationVersion = VK_MAKE_VERSION(major, minor, patch),
-            .pEngineName = settings.engineName.c_str(),
-            .engineVersion = VK_MAKE_VERSION(engineMajor, engineMinor, enginePatch),
-            .apiVersion = VK_API_VERSION_1_4,
-        };
+        if (settings.logger != nullptr)
+        {
+            messenger = CreateDebugMessenger(instance.get(), *settings.logger);
+        }
 
-        const auto getName = [](const auto &x) { return x.name.c_str(); };
+        auto api = VulkanApi{.instance = std::move(instance), .messenger = std::move(messenger)};
 
-        auto extensions = settings.extensions | std::views::transform(getName) | std::ranges::to<std::vector>();
-        auto layers = settings.layers | std::views::transform(getName) | std::ranges::to<std::vector>();
-
-        const auto instanceInfo = VkInstanceCreateInfo{
-            .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .pApplicationInfo = &applicationInfo,
-            .enabledLayerCount = static_cast<std::uint32_t>(layers.size()),
-            .ppEnabledLayerNames = layers.data(),
-            .enabledExtensionCount = static_cast<std::uint32_t>(extensions.size()),
-            .ppEnabledExtensionNames = extensions.data(),
-        };
-
-        auto *instance = VkInstance();
-
-        const auto result = vkCreateInstance(&instanceInfo, nullptr, &instance);
-        ThrowIfVulkanError("Cannot create Vulkan instance", result);
-
-        return {std::make_shared<VkInstance>(instance)};
+        return {std::make_shared<VulkanApi>(std::move(api))};
     }
 }
