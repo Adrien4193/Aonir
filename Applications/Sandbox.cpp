@@ -76,9 +76,9 @@ auto main(int argc, const char **argv) -> int
         .logger = &logger,
     });
 
-    const auto physicalDevices = api.getAvailablePhysicalDevices();
+    const auto adapters = api.getAvailableAdapters();
 
-    (void)physicalDevices;
+    (void)adapters;
 
     auto closed = false;
 

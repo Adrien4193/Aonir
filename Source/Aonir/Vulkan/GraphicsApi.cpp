@@ -155,43 +155,43 @@ namespace
         return {messenger, {.instance = instance, .destroyMessenger = destroyMessenger}};
     }
 
-    auto GetPhysicalDeviceType(VkPhysicalDeviceType type) -> std::optional<PhysicalDeviceType>
+    auto TryGetAdapterType(VkPhysicalDeviceType type) -> std::optional<AdapterType>
     {
         switch (type)
         {
         case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
-            return PhysicalDeviceType::IntegratedGpu;
+            return AdapterType::IntegratedGpu;
         case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
-            return PhysicalDeviceType::DiscreteGpu;
+            return AdapterType::DiscreteGpu;
         case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
-            return PhysicalDeviceType::VirtualGpu;
+            return AdapterType::VirtualGpu;
         case VK_PHYSICAL_DEVICE_TYPE_CPU:
-            return PhysicalDeviceType::Cpu;
+            return AdapterType::Cpu;
         default:
             return std::nullopt;
         }
     }
 
-    auto TryGetPhysicalDeviceProperties(VkPhysicalDevice device) -> std::optional<PhysicalDevice>
+    auto GetAdapterIfSupported(VkPhysicalDevice device) -> std::optional<Adapter>
     {
         auto properties = VkPhysicalDeviceProperties();
         vkGetPhysicalDeviceProperties(device, &properties);
 
-        auto type = GetPhysicalDeviceType(properties.deviceType);
+        auto type = TryGetAdapterType(properties.deviceType);
 
         if (!type)
         {
             return std::nullopt;
         }
 
-        return PhysicalDevice{
-            .nativeHandle = NativePhysicalDeviceHandle(device),
+        return Adapter{
+            .nativeHandle = NativeAdapterHandle(device),
             .name = properties.deviceName,
             .type = *type,
         };
     }
 
-    auto GetAvailablePhysicalDevices(VkInstance instance) -> std::vector<PhysicalDevice>
+    auto GetAvailableAdapters(VkInstance instance) -> std::vector<Adapter>
     {
         auto deviceCount = std::uint32_t();
 
@@ -203,7 +203,7 @@ namespace
         result = vkEnumeratePhysicalDevices(instance, &deviceCount, availableDevices.data());
         ThrowIfVulkanError("Cannot enumerate Vulkan physical devices", result);
 
-        const auto tryGet = std::views::transform([](auto *x) { return TryGetPhysicalDeviceProperties(x); });
+        const auto tryGet = std::views::transform([](auto *x) { return GetAdapterIfSupported(x); });
         const auto ifSupported = std::views::filter([](const auto &x) { return x.has_value(); });
         const auto andGet = std::views::transform([](auto &&x) { return std::move(*x); });
 
@@ -286,7 +286,7 @@ namespace Aonir
 
         return {
             .nativeHandle = NativeGraphicsApiHandle(ptr->instance.get()),
-            .getAvailablePhysicalDevices = [=] { return GetAvailablePhysicalDevices(ptr->instance.get()); },
+            .getAvailableAdapters = [=] { return GetAvailableAdapters(ptr->instance.get()); },
         };
     }
 }

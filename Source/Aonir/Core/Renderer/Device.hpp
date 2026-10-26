@@ -7,14 +7,14 @@
 
 namespace Aonir
 {
-    struct NativePhysicalDeviceHandle
+    struct NativeAdapterHandle
     {
         void *ptr;
 
-        auto operator<=>(const NativePhysicalDeviceHandle &) const = default;
+        auto operator<=>(const NativeAdapterHandle &) const = default;
     };
 
-    enum class PhysicalDeviceType : std::uint8_t
+    enum class AdapterType : std::uint8_t
     {
         IntegratedGpu,
         DiscreteGpu,
@@ -22,16 +22,16 @@ namespace Aonir
         Cpu,
     };
 
-    struct PhysicalDevice
+    struct Adapter
     {
-        NativePhysicalDeviceHandle nativeHandle;
+        NativeAdapterHandle nativeHandle;
         std::string name;
-        PhysicalDeviceType type;
+        AdapterType type;
     };
 
     struct DeviceSettings
     {
-        NativePhysicalDeviceHandle physicalDevice;
+        NativeAdapterHandle adapter;
     };
 
     struct NativeDeviceHandle

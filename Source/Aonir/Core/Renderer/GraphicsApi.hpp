@@ -21,6 +21,6 @@ namespace Aonir
     struct GraphicsApi
     {
         NativeGraphicsApiHandle nativeHandle;
-        std::function<auto()->std::vector<PhysicalDevice>> getAvailablePhysicalDevices;
+        std::function<auto()->std::vector<Adapter>> getAvailableAdapters;
     };
 }
