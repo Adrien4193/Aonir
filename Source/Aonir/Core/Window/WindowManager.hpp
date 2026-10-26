@@ -14,7 +14,7 @@ namespace Aonir
     {
     private:
         WindowFactory m_factory;
-        std::map<NativeWindowHandle, WindowPrivate> m_windows;
+        std::map<NativeWindow, WindowPrivate> m_windows;
 
     public:
         AONIR_CORE_API explicit WindowManager(WindowFactory factory);

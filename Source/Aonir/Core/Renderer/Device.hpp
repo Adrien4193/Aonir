@@ -7,11 +7,11 @@
 
 namespace Aonir
 {
-    struct NativeAdapterHandle
+    struct NativeAdapter
     {
         void *ptr;
 
-        auto operator<=>(const NativeAdapterHandle &) const = default;
+        auto operator<=>(const NativeAdapter &) const = default;
     };
 
     enum class AdapterType : std::uint8_t
@@ -24,25 +24,25 @@ namespace Aonir
 
     struct Adapter
     {
-        NativeAdapterHandle nativeHandle;
+        NativeAdapter native;
         std::string name;
         AdapterType type;
     };
 
     struct DeviceSettings
     {
-        NativeAdapterHandle adapter;
+        NativeAdapter adapter;
     };
 
-    struct NativeDeviceHandle
+    struct NativeDevice
     {
         void *ptr;
 
-        auto operator<=>(const NativeDeviceHandle &) const = default;
+        auto operator<=>(const NativeDevice &) const = default;
     };
 
     struct Device
     {
-        NativeDeviceHandle nativeHandle;
+        NativeDevice native;
     };
 }

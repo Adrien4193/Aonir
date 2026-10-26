@@ -18,16 +18,16 @@ namespace Aonir
         WindowSize size;
     };
 
-    struct NativeWindowHandle
+    struct NativeWindow
     {
         void *ptr;
 
-        auto operator<=>(const NativeWindowHandle &) const = default;
+        auto operator<=>(const NativeWindow &) const = default;
     };
 
     struct WindowHandle
     {
-        NativeWindowHandle native;
+        NativeWindow native;
         std::function<auto()->std::vector<WindowEvent>> poll;
         std::function<auto()->void> show;
         std::function<auto(std::string_view)->void> setTitle;
@@ -59,7 +59,7 @@ namespace Aonir
     public:
         AONIR_CORE_API explicit Window(const WindowPrivate &window);
 
-        [[nodiscard]] AONIR_CORE_API auto GetNativeHandle() const -> NativeWindowHandle;
+        [[nodiscard]] AONIR_CORE_API auto GetNativeWindow() const -> NativeWindow;
         AONIR_CORE_API auto Show() -> void;
         [[nodiscard]] AONIR_CORE_API auto GetTitle() const -> const std::string &;
         AONIR_CORE_API auto SetTitle(std::string_view title) -> void;

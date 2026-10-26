@@ -36,7 +36,7 @@ namespace Aonir
 
     auto WindowManager::Remove(Window window) -> void
     {
-        m_windows.erase(window.GetNativeHandle());
+        m_windows.erase(window.GetNativeWindow());
     }
 
     auto WindowManager::Poll() -> void

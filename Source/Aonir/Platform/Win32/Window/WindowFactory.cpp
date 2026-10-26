@@ -93,7 +93,7 @@ namespace
         const auto holder = std::make_shared<WindowHolder>(thread, std::move(window));
 
         return WindowHandle{
-            .native = NativeWindowHandle{holder->GetHandle().GetNativeHandle()},
+            .native = NativeWindow{holder->GetHandle().GetNativeWindow()},
             .poll = [=] { return events->Poll(); },
             .show = [=] { holder->GetHandle().Show(SW_NORMAL); },
             .setTitle = [=](auto title) { holder->GetHandle().SetTitle(title); },

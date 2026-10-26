@@ -185,7 +185,7 @@ namespace
         }
 
         return Adapter{
-            .nativeHandle = NativeAdapterHandle(device),
+            .native = NativeAdapter(device),
             .name = properties.deviceName,
             .type = *type,
         };
@@ -285,7 +285,7 @@ namespace Aonir
         const auto ptr = std::make_shared<VulkanApi>(std::move(api));
 
         return {
-            .nativeHandle = NativeGraphicsApiHandle(ptr->instance.get()),
+            .native = NativeGraphicsApi(ptr->instance.get()),
             .getAvailableAdapters = [=] { return GetAvailableAdapters(ptr->instance.get()); },
         };
     }

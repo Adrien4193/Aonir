@@ -11,16 +11,16 @@
 
 namespace Aonir
 {
-    struct NativeGraphicsApiHandle
+    struct NativeGraphicsApi
     {
         void *ptr;
 
-        auto operator<=>(const NativeGraphicsApiHandle &) const = default;
+        auto operator<=>(const NativeGraphicsApi &) const = default;
     };
 
     struct GraphicsApi
     {
-        NativeGraphicsApiHandle nativeHandle;
+        NativeGraphicsApi native;
         std::function<auto()->std::vector<Adapter>> getAvailableAdapters;
     };
 }

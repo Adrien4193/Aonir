@@ -22,7 +22,7 @@ namespace Aonir
     public:
         explicit Win32WindowHandle(HWND handle);
 
-        [[nodiscard]] auto GetNativeHandle() const -> HWND;
+        [[nodiscard]] auto GetNativeWindow() const -> HWND;
         auto Show(int code) -> void;
         auto SetTitle(std::string_view title) -> void;
         auto SetPosition(const WindowPosition &position) -> void;

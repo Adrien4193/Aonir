@@ -27,7 +27,7 @@ namespace Aonir
     {
     }
 
-    auto Win32WindowHandle::GetNativeHandle() const -> HWND
+    auto Win32WindowHandle::GetNativeWindow() const -> HWND
     {
         return m_handle.get();
     }

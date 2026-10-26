@@ -23,7 +23,7 @@ namespace Aonir
     {
     }
 
-    auto Window::GetNativeHandle() const -> NativeWindowHandle
+    auto Window::GetNativeWindow() const -> NativeWindow
     {
         return m_window->handle.native;
     }
