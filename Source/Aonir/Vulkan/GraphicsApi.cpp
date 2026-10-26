@@ -155,42 +155,6 @@ namespace
         return {messenger, {.instance = instance, .destroyMessenger = destroyMessenger}};
     }
 
-    auto TryGetAdapterType(VkPhysicalDeviceType type) -> std::optional<AdapterType>
-    {
-        switch (type)
-        {
-        case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
-            return AdapterType::IntegratedGpu;
-        case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
-            return AdapterType::DiscreteGpu;
-        case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
-            return AdapterType::VirtualGpu;
-        case VK_PHYSICAL_DEVICE_TYPE_CPU:
-            return AdapterType::Cpu;
-        default:
-            return std::nullopt;
-        }
-    }
-
-    auto GetAdapterIfSupported(VkPhysicalDevice device) -> std::optional<Adapter>
-    {
-        auto properties = VkPhysicalDeviceProperties();
-        vkGetPhysicalDeviceProperties(device, &properties);
-
-        auto type = TryGetAdapterType(properties.deviceType);
-
-        if (!type)
-        {
-            return std::nullopt;
-        }
-
-        return Adapter{
-            .native = NativeAdapter(device),
-            .name = properties.deviceName,
-            .type = *type,
-        };
-    }
-
     auto GetAvailableAdapters(VkInstance instance) -> std::vector<Adapter>
     {
         auto deviceCount = std::uint32_t();
@@ -203,11 +167,18 @@ namespace
         result = vkEnumeratePhysicalDevices(instance, &deviceCount, availableDevices.data());
         ThrowIfVulkanError("Cannot enumerate Vulkan physical devices", result);
 
-        const auto tryGet = std::views::transform([](auto *x) { return GetAdapterIfSupported(x); });
-        const auto ifSupported = std::views::filter([](const auto &x) { return x.has_value(); });
-        const auto andGet = std::views::transform([](auto &&x) { return std::move(*x); });
+        const auto toEngine = [](auto x)
+        {
+            auto properties = VkPhysicalDeviceProperties();
+            vkGetPhysicalDeviceProperties(x, &properties);
 
-        return availableDevices | tryGet | ifSupported | andGet | std::ranges::to<std::vector>();
+            return Adapter{
+                .native = NativeAdapter(x),
+                .name = properties.deviceName,
+            };
+        };
+
+        return availableDevices | std::views::transform(toEngine) | std::ranges::to<std::vector>();
     }
 
     struct VulkanApi

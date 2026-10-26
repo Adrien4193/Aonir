@@ -14,19 +14,10 @@ namespace Aonir
         auto operator<=>(const NativeAdapter &) const = default;
     };
 
-    enum class AdapterType : std::uint8_t
-    {
-        IntegratedGpu,
-        DiscreteGpu,
-        VirtualGpu,
-        Cpu,
-    };
-
     struct Adapter
     {
         NativeAdapter native;
         std::string name;
-        AdapterType type;
     };
 
     struct DeviceSettings
