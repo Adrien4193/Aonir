@@ -1,4 +1,4 @@
-#include "GraphicsApi.hpp"
+#include "GpuFactory.hpp"
 
 #include <cstddef>
 #include <cstdint>
@@ -10,8 +10,8 @@
 #include <vulkan/vk_platform.h>
 #include <vulkan/vulkan_core.h>
 
-#include <Aonir/Core/Renderer/Device.hpp>
-#include <Aonir/Core/Renderer/GraphicsApi.hpp>
+#include <Aonir/Core/Renderer/GpuDevice.hpp>
+#include <Aonir/Core/Renderer/GpuFactory.hpp>
 #include <Aonir/Core/Utils/Exception.hpp>
 #include <Aonir/Core/Utils/Flags.hpp>
 #include <Aonir/Core/Utils/Logger.hpp>
@@ -24,7 +24,7 @@ namespace
 
     using VulkanInstance = std::unique_ptr<VkInstance_T, decltype([](auto *x) { vkDestroyInstance(x, nullptr); })>;
 
-    auto CreateVulkanInstance(const VulkanSettings &settings) -> VulkanInstance
+    auto CreateInstance(const VulkanSettings &settings) -> VulkanInstance
     {
         auto [major, minor, patch] = settings.applicationVersion;
         auto [engineMajor, engineMinor, enginePatch] = settings.engineVersion;
@@ -154,7 +154,7 @@ namespace
         return {messenger, {.instance = instance, .destroyMessenger = destroyMessenger}};
     }
 
-    auto GetAvailableAdapters(VkInstance instance) -> std::vector<Adapter>
+    auto GetAvailableAdapters(VkInstance instance) -> std::vector<GpuAdapter>
     {
         auto deviceCount = std::uint32_t();
 
@@ -171,13 +171,28 @@ namespace
             auto properties = VkPhysicalDeviceProperties();
             vkGetPhysicalDeviceProperties(x, &properties);
 
-            return Adapter{
-                .native = NativeAdapter(x),
+            return GpuAdapter{
+                .native = NativeGpuAdapter(x),
                 .name = properties.deviceName,
             };
         };
 
         return availableDevices | std::views::transform(toEngine) | std::ranges::to<std::vector>();
+    }
+
+    auto CreateDevice(VkInstance instance, const GpuDeviceSettings &settings) -> GpuDevice
+    {
+        (void)instance;
+
+        auto *physicalDevice = static_cast<VkPhysicalDevice>(settings.adapter.ptr);
+
+        auto queueFamilyCount = std::uint32_t();
+        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
+
+        auto queueFamilies = std::vector<VkQueueFamilyProperties>();
+        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());
+
+        return GpuDevice(NativeGpuDevice(nullptr)); // TODO
     }
 
     struct VulkanApi
@@ -241,9 +256,10 @@ namespace Aonir
         return availableLayers | std::views::transform(toEngine) | std::ranges::to<std::vector>();
     }
 
-    auto CreateVulkanGraphicsApi(const VulkanSettings &settings) -> GraphicsApi
+    auto CreateVulkanInstance(const VulkanSettings &settings) -> GpuFactory
     {
-        auto instance = CreateVulkanInstance(settings);
+        auto instance = CreateInstance(settings);
+
         auto messenger = VulkanDebugMessenger();
 
         if (settings.logger != nullptr)
@@ -251,12 +267,15 @@ namespace Aonir
             messenger = CreateDebugMessenger(instance.get(), *settings.logger);
         }
 
+        auto availableAdapters = GetAvailableAdapters(instance.get());
+
         auto api = VulkanApi{.instance = std::move(instance), .messenger = std::move(messenger)};
         const auto ptr = std::make_shared<VulkanApi>(std::move(api));
 
         return {
-            .native = NativeGraphicsApi(ptr->instance.get()),
-            .getAvailableAdapters = [=] { return GetAvailableAdapters(ptr->instance.get()); },
+            .native = NativeGpuFactory(ptr->instance.get()),
+            .availableAdapters = std::move(availableAdapters),
+            .createDevice = [=](const auto &x) { return CreateDevice(ptr->instance.get(), x); },
         };
     }
 }

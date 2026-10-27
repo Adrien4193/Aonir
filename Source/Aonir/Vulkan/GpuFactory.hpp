@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <Aonir/Core/Renderer/GraphicsApi.hpp>
+#include <Aonir/Core/Renderer/GpuFactory.hpp>
 #include <Aonir/Core/Utils/Logger.hpp>
 #include <Aonir/Core/Utils/Version.hpp>
 
@@ -39,5 +39,5 @@ namespace Aonir
     AONIR_VULKAN_API auto GetKhronosVulkanValidationLayerName() -> const char *;
     AONIR_VULKAN_API auto GetAvailableVulkanExtensions() -> std::vector<VulkanExtension>;
     AONIR_VULKAN_API auto GetAvailableVulkanValidationLayers() -> std::vector<VulkanValidationLayer>;
-    AONIR_VULKAN_API auto CreateVulkanGraphicsApi(const VulkanSettings &settings) -> GraphicsApi;
+    AONIR_VULKAN_API auto CreateVulkanInstance(const VulkanSettings &settings) -> GpuFactory;
 }

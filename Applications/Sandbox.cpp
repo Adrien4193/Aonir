@@ -12,7 +12,7 @@
 
 #include <Aonir/Platform/Win32/Window/WindowFactory.hpp>
 
-#include <Aonir/Vulkan/GraphicsApi.hpp>
+#include <Aonir/Vulkan/GpuFactory.hpp>
 
 using namespace Aonir;
 
@@ -66,7 +66,7 @@ auto main(int argc, const char **argv) -> int
     const auto extensions = GetAvailableVulkanExtensions();
     const auto layers = GetAvailableVulkanValidationLayers();
 
-    const auto api = CreateVulkanGraphicsApi({
+    const auto gpuFactory = CreateVulkanInstance({
         .applicationName = "Sandbox",
         .applicationVersion = Version{.major = 1, .minor = 0, .patch = 0},
         .engineName = "Aonir",
@@ -76,9 +76,7 @@ auto main(int argc, const char **argv) -> int
         .logger = &logger,
     });
 
-    const auto adapters = api.getAvailableAdapters();
-
-    (void)adapters;
+    (void)gpuFactory;
 
     auto closed = false;
 
