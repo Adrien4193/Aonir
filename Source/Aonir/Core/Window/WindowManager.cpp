@@ -20,15 +20,17 @@ namespace Aonir
     auto WindowManager::Add(const WindowSettings &settings) -> Window
     {
         auto handle = m_factory(settings);
-
-        auto buffer = CreateWindowBuffer(settings);
+        const auto nativeWindow = handle.native;
 
         auto window = WindowPrivate{
             .handle = std::move(handle),
-            .buffer = std::move(buffer),
+            .title = settings.title,
+            .position = settings.position,
+            .size = settings.size,
+            .events = {},
         };
 
-        auto [i, inserted] = m_windows.emplace(window.handle.native, std::move(window));
+        auto [i, inserted] = m_windows.emplace(nativeWindow, std::move(window));
         assert(inserted);
 
         return Window(i->second);
@@ -43,16 +45,16 @@ namespace Aonir
     {
         for (auto &[_, window] : m_windows)
         {
-            window.buffer.events = window.handle.poll();
+            window.events = window.handle.poll();
 
             auto processEvent = Overload{
-                [&](const WindowRename &e) { window.buffer.title = e.title; },
-                [&](const WindowMove &e) { window.buffer.position = e.position; },
-                [&](const WindowResize &e) { window.buffer.size = e.size; },
+                [&](const WindowRename &e) { window.title = e.title; },
+                [&](const WindowMove &e) { window.position = e.position; },
+                [&](const WindowResize &e) { window.size = e.size; },
                 [](const auto &) {},
             };
 
-            for (const auto &event : window.buffer.events)
+            for (const auto &event : window.events)
             {
                 std::visit(processEvent, event);
             }

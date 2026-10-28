@@ -2,6 +2,7 @@
 
 #include <compare>
 #include <exception>
+#include <functional>
 #include <optional>
 #include <string>
 #include <variant>
@@ -143,4 +144,6 @@ namespace Aonir
         KeyPress,
         KeyRelease,
         KeyText>;
+
+    using WindowListener = std::function<auto(WindowEvent)->void>;
 }

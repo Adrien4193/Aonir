@@ -8,16 +8,6 @@
 
 namespace Aonir
 {
-    auto CreateWindowBuffer(const WindowSettings &settings) -> WindowBuffer
-    {
-        return WindowBuffer{
-            .title = settings.title,
-            .position = settings.position,
-            .size = settings.size,
-            .events = {},
-        };
-    }
-
     Window::Window(const WindowPrivate &window):
         m_window(&window)
     {
@@ -35,7 +25,7 @@ namespace Aonir
 
     auto Window::GetTitle() const -> const std::string &
     {
-        return m_window->buffer.title;
+        return m_window->title;
     }
 
     auto Window::SetTitle(std::string_view title) -> void
@@ -45,7 +35,7 @@ namespace Aonir
 
     auto Window::GetPosition() const -> const WindowPosition &
     {
-        return m_window->buffer.position;
+        return m_window->position;
     }
 
     auto Window::SetPosition(const WindowPosition &position) -> void
@@ -55,7 +45,7 @@ namespace Aonir
 
     auto Window::GetSize() const -> const WindowSize &
     {
-        return m_window->buffer.size;
+        return m_window->size;
     }
 
     auto Window::Resize(const WindowSize &size) -> void
@@ -65,6 +55,6 @@ namespace Aonir
 
     auto Window::GetEvents() const -> const std::vector<WindowEvent> &
     {
-        return m_window->buffer.events;
+        return m_window->events;
     }
 }

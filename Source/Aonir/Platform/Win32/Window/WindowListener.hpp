@@ -4,20 +4,9 @@
 
 #include <Windows.h>
 
-#include <Aonir/Core/Window/Window.hpp>
+#include <Aonir/Core/Window/WindowEvent.hpp>
 
 namespace Aonir
 {
-    using WindowListener = std::function<auto(WindowEvent)->void>;
-
-    class Win32WindowListener
-    {
-    private:
-        WindowListener m_listener;
-
-    public:
-        explicit Win32WindowListener(WindowListener listener);
-
-        auto ProcessMessage(HWND window, UINT type, WPARAM wparam, LPARAM lparam) -> LRESULT;
-    };
+    auto ProcessWindowMessage(const WindowListener &listener, HWND window, UINT type, WPARAM wparam, LPARAM lparam) -> LRESULT;
 }

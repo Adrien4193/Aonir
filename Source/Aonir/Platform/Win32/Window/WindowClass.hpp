@@ -8,17 +8,11 @@
 
 #include <Aonir/Core/Window/Window.hpp>
 
-#include "WindowHandle.hpp"
+#include "Window.hpp"
 #include "WindowListener.hpp"
 
 namespace Aonir
 {
-    struct Win32Window
-    {
-        Win32WindowHandle handle;
-        std::unique_ptr<Win32WindowListener> listener;
-    };
-
     class Win32WindowClass
     {
     private:

@@ -1,7 +1,9 @@
-#include "WindowHandle.hpp"
+#include "Window.hpp"
 
 #include <cassert>
+#include <memory>
 #include <string_view>
+#include <utility>
 
 #include <Windows.h> // NOLINT(misc-include-cleaner)
 
@@ -16,28 +18,29 @@
 
 namespace Aonir
 {
-    auto Win32WindowHandle::Deleter::operator()(HWND handle) const -> void
+    auto Win32Window::Deleter::operator()(HWND handle) const -> void
     {
         [[maybe_unused]] const auto success = DestroyWindow(handle);
         assert(success == TRUE);
     }
 
-    Win32WindowHandle::Win32WindowHandle(HWND handle):
-        m_handle(handle)
+    Win32Window::Win32Window(HWND handle, std::unique_ptr<WindowListener> listener):
+        m_handle(handle),
+        m_listener(std::move(listener))
     {
     }
 
-    auto Win32WindowHandle::GetNativeWindow() const -> HWND
+    auto Win32Window::GetNativeWindow() const -> HWND
     {
         return m_handle.get();
     }
 
-    auto Win32WindowHandle::Show(int code) -> void
+    auto Win32Window::Show() -> void
     {
-        ShowWindow(m_handle.get(), code);
+        ShowWindow(m_handle.get(), SW_NORMAL);
     }
 
-    auto Win32WindowHandle::SetTitle(std::string_view title) -> void
+    auto Win32Window::SetTitle(std::string_view title) -> void
     {
         const auto wtitle = ToUtf16(title);
 
@@ -45,11 +48,11 @@ namespace Aonir
 
         if (success == FALSE)
         {
-            throw Win32LastError("Failed to set window title");
+            throw Win32LastError("Cannot set window title");
         }
     }
 
-    auto Win32WindowHandle::SetPosition(const WindowPosition &position) -> void
+    auto Win32Window::SetPosition(const WindowPosition &position) -> void
     {
         const auto flags = static_cast<UINT>(SWP_NOSIZE | SWP_NOACTIVATE);
 
@@ -60,11 +63,11 @@ namespace Aonir
 
         if (success == FALSE)
         {
-            throw Win32LastError("Failed to set window position");
+            throw Win32LastError("Cannot set window position");
         }
     }
 
-    auto Win32WindowHandle::Resize(const WindowSize &size) -> void
+    auto Win32Window::Resize(const WindowSize &size) -> void
     {
         const auto flags = static_cast<UINT>(SWP_NOMOVE | SWP_NOACTIVATE);
 
@@ -75,7 +78,7 @@ namespace Aonir
 
         if (success == FALSE)
         {
-            throw Win32LastError("Failed to set window size");
+            throw Win32LastError("Cannot set window size");
         }
     }
 }

@@ -5,11 +5,11 @@
 
 #include <Windows.h>
 
-#include <Aonir/Core/Window/Window.hpp>
+#include <Aonir/Core/Window/WindowEvent.hpp>
 
 namespace Aonir
 {
-    class Win32WindowHandle
+    class Win32Window
     {
     private:
         struct Deleter
@@ -18,12 +18,13 @@ namespace Aonir
         };
 
         std::unique_ptr<HWND__, Deleter> m_handle;
+        std::unique_ptr<WindowListener> m_listener;
 
     public:
-        explicit Win32WindowHandle(HWND handle);
+        explicit Win32Window(HWND handle, std::unique_ptr<WindowListener> listener);
 
         [[nodiscard]] auto GetNativeWindow() const -> HWND;
-        auto Show(int code) -> void;
+        auto Show() -> void;
         auto SetTitle(std::string_view title) -> void;
         auto SetPosition(const WindowPosition &position) -> void;
         auto Resize(const WindowSize &size) -> void;

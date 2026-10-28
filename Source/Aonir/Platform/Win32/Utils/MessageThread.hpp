@@ -25,9 +25,9 @@ namespace Aonir
         ~Win32MessageThread();
 
         Win32MessageThread(const Win32MessageThread &) = delete;
-        auto operator=(const Win32MessageThread &) -> Win32MessageThread & = delete;
-
         Win32MessageThread(Win32MessageThread &&) = default;
+
+        auto operator=(const Win32MessageThread &) -> Win32MessageThread & = delete;
         auto operator=(Win32MessageThread &&) -> Win32MessageThread & = default;
 
         auto Run(std::invocable<> auto &&task) const -> decltype(task())

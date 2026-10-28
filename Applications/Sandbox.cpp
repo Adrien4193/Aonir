@@ -51,9 +51,7 @@ auto main(int argc, const char **argv) -> int
         logger.Info("argv [{}]: {}", i, argv[i]);
     }
 
-    auto windows = WindowManager(CreateWin32WindowFactory({
-        .className = "Aonir",
-    }));
+    auto windows = WindowManager(CreateWin32WindowFactory({.className = "Aonir"}));
 
     auto window = windows.Add({
         .title = "Sandbox",

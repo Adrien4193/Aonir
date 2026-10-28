@@ -35,20 +35,13 @@ namespace Aonir
         std::function<auto(const WindowSize &)->void> resize;
     };
 
-    struct WindowBuffer
+    struct WindowPrivate
     {
+        WindowHandle handle;
         std::string title;
         WindowPosition position;
         WindowSize size;
         std::vector<WindowEvent> events;
-    };
-
-    AONIR_CORE_API auto CreateWindowBuffer(const WindowSettings &settings) -> WindowBuffer;
-
-    struct WindowPrivate
-    {
-        WindowHandle handle;
-        WindowBuffer buffer;
     };
 
     class Window

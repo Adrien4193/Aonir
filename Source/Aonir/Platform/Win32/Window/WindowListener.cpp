@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <exception>
 #include <optional>
-#include <utility>
 
 #include <Windows.h> // NOLINT(misc-include-cleaner)
 
@@ -102,66 +101,61 @@ namespace
 
 namespace Aonir
 {
-    Win32WindowListener::Win32WindowListener(WindowListener listener):
-        m_listener(std::move(listener))
-    {
-    }
-
-    auto Win32WindowListener::ProcessMessage(HWND window, UINT type, WPARAM wparam, LPARAM lparam) -> LRESULT
+    auto ProcessWindowMessage(const WindowListener &listener, HWND window, UINT type, WPARAM wparam, LPARAM lparam) -> LRESULT
     {
         try
         {
             switch (type)
             {
             case WM_MOUSEMOVE:
-                m_listener(DeserializeMouseMove(lparam));
+                listener(DeserializeMouseMove(lparam));
                 return 0;
             case WM_LBUTTONDOWN:
-                m_listener(MouseButtonPress(MouseButton::Left));
+                listener(MouseButtonPress(MouseButton::Left));
                 return 0;
             case WM_LBUTTONUP:
-                m_listener(MouseButtonRelease(MouseButton::Left));
+                listener(MouseButtonRelease(MouseButton::Left));
                 return 0;
             case WM_RBUTTONDOWN:
-                m_listener(MouseButtonPress(MouseButton::Right));
+                listener(MouseButtonPress(MouseButton::Right));
                 return 0;
             case WM_RBUTTONUP:
-                m_listener(MouseButtonRelease(MouseButton::Right));
+                listener(MouseButtonRelease(MouseButton::Right));
                 return 0;
             case WM_MBUTTONDOWN:
-                m_listener(MouseButtonPress(MouseButton::Middle));
+                listener(MouseButtonPress(MouseButton::Middle));
                 return 0;
             case WM_MBUTTONUP:
-                m_listener(MouseButtonRelease(MouseButton::Middle));
+                listener(MouseButtonRelease(MouseButton::Middle));
                 return 0;
             case WM_MOUSEWHEEL:
-                m_listener(DeserializeMouseScroll(wparam, true));
+                listener(DeserializeMouseScroll(wparam, true));
                 return 0;
             case WM_MOUSEHWHEEL:
-                m_listener(DeserializeMouseScroll(wparam, false));
+                listener(DeserializeMouseScroll(wparam, false));
                 return 0;
             case WM_KEYDOWN:
             case WM_SYSKEYDOWN:
-                m_listener(KeyPress(DeserializeKey(wparam, lparam)));
+                listener(KeyPress(DeserializeKey(wparam, lparam)));
                 return 0;
             case WM_KEYUP:
             case WM_SYSKEYUP:
-                m_listener(KeyRelease(DeserializeKey(wparam, lparam)));
+                listener(KeyRelease(DeserializeKey(wparam, lparam)));
                 return 0;
             case WM_CHAR:
-                m_listener(KeyText(static_cast<Codepoint>(wparam)));
+                listener(KeyText(static_cast<Codepoint>(wparam)));
                 return 0;
             case WM_SETTEXT:
-                m_listener(DeserializeWindowRename(lparam));
+                listener(DeserializeWindowRename(lparam));
                 break;
             case WM_MOVE:
-                m_listener(DeserializeWindowMove(lparam));
+                listener(DeserializeWindowMove(lparam));
                 return 0;
             case WM_SIZE:
-                m_listener(DeserializeWindowResize(lparam));
+                listener(DeserializeWindowResize(lparam));
                 return 0;
             case WM_CLOSE:
-                m_listener(WindowClose());
+                listener(WindowClose());
                 return 0;
             default:
                 break;
@@ -169,7 +163,7 @@ namespace Aonir
         }
         catch (...)
         {
-            m_listener(WindowError(std::current_exception()));
+            listener(WindowError(std::current_exception()));
         }
 
         return DefWindowProcW(window, type, wparam, lparam);

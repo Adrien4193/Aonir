@@ -4,10 +4,10 @@
 
 namespace Aonir
 {
-    struct Win32WindowFactorySettings
+    struct Win32WindowManagerSettings
     {
         std::string className;
     };
 
-    AONIR_PLATFORM_API auto CreateWin32WindowFactory(const Win32WindowFactorySettings &settings) -> WindowFactory;
+    AONIR_PLATFORM_API auto CreateWin32WindowFactory(const Win32WindowManagerSettings &settings) -> WindowFactory;
 }

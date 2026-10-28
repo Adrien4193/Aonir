@@ -10,17 +10,16 @@
 
 #include <Windows.h> // NOLINT(misc-include-cleaner)
 
-#include <WinUser.h>
 #include <libloaderapi.h>
-#include <minwindef.h>
 
 #include <Aonir/Core/Window/Window.hpp>
 #include <Aonir/Core/Window/WindowEvent.hpp>
 #include <Aonir/Core/Window/WindowManager.hpp>
 
 #include <Aonir/Platform/Win32/Utils/MessageThread.hpp>
-#include <Aonir/Platform/Win32/Window/WindowClass.hpp>
-#include <Aonir/Platform/Win32/Window/WindowHandle.hpp>
+
+#include "Window.hpp"
+#include "WindowClass.hpp"
 
 namespace
 {
@@ -46,24 +45,24 @@ namespace
         }
     };
 
-    class WindowHolder
+    class Win32WindowHandle
     {
     private:
-        std::reference_wrapper<Win32MessageThread> m_thread;
+        std::reference_wrapper<Win32MessageThread> m_messageThread;
         std::optional<Win32Window> m_window;
 
     public:
-        explicit WindowHolder(Win32MessageThread &thread, Win32Window window):
-            m_thread(thread),
+        explicit Win32WindowHandle(Win32MessageThread &messageThread, Win32Window window):
+            m_messageThread(messageThread),
             m_window(std::move(window))
         {
         }
 
-        ~WindowHolder()
+        ~Win32WindowHandle()
         {
             try
             {
-                m_thread.get().Run([this] { m_window.reset(); });
+                m_messageThread.get().Run([this] { m_window.reset(); });
             }
             catch (...)
             {
@@ -71,64 +70,72 @@ namespace
             }
         }
 
-        WindowHolder(const WindowHolder &) = delete;
-        auto operator=(const WindowHolder &) -> WindowHolder & = delete;
+        Win32WindowHandle(const Win32WindowHandle &) = delete;
+        Win32WindowHandle(Win32WindowHandle &&) = delete;
 
-        WindowHolder(WindowHolder &&) = delete;
-        auto operator=(WindowHolder &&) -> WindowHolder & = delete;
+        auto operator=(const Win32WindowHandle &) -> Win32WindowHandle = delete;
+        auto operator=(Win32WindowHandle &&) -> Win32WindowHandle = delete;
 
-        auto GetHandle() -> Win32WindowHandle &
+        auto GetWindow() -> Win32Window &
         {
-            return m_window->handle; // NOLINT(bugprone-unchecked-optional-access)
+            return *m_window; // NOLINT(bugprone-unchecked-optional-access)
         }
     };
 
-    auto Instanciate(Win32MessageThread &thread, Win32WindowClass &windowClass, const WindowSettings &settings) -> WindowHandle
+    class Win32WindowFactory
     {
-        const auto events = std::make_shared<EventBuffer>();
-        auto listener = [=](auto event) { events->Add(std::move(event)); };
+    private:
+        Win32MessageThread m_messageThread;
+        Win32WindowClass m_windowClass;
 
-        auto window = thread.Run([&] { return windowClass.Instanciate(settings, listener); });
+    public:
+        explicit Win32WindowFactory(Win32MessageThread messageThread, Win32WindowClass windowClass):
+            m_messageThread(std::move(messageThread)),
+            m_windowClass(std::move(windowClass))
+        {
+        }
 
-        const auto holder = std::make_shared<WindowHolder>(thread, std::move(window));
+        ~Win32WindowFactory() = default;
 
-        return WindowHandle{
-            .native = NativeWindow(holder->GetHandle().GetNativeWindow()),
-            .poll = [=] { return events->Poll(); },
-            .show = [=] { holder->GetHandle().Show(SW_NORMAL); },
-            .setTitle = [=](auto title) { holder->GetHandle().SetTitle(title); },
-            .setPosition = [=](const auto &position) { holder->GetHandle().SetPosition(position); },
-            .resize = [=](const auto &size) { holder->GetHandle().Resize(size); },
-        };
-    }
+        Win32WindowFactory(const Win32WindowFactory &) = delete;
+        Win32WindowFactory(Win32WindowFactory &&) = delete;
 
-    struct Win32WindowFactory
-    {
-        Win32MessageThread thread;
-        Win32WindowClass windowClass;
+        auto operator=(const Win32WindowFactory &) -> Win32WindowFactory = delete;
+        auto operator=(Win32WindowFactory &&) -> Win32WindowFactory = delete;
+
+        auto CreateWindowHandle(const WindowSettings &settings) -> WindowHandle
+        {
+            const auto events = std::make_shared<EventBuffer>();
+            const auto listener = [=](auto x) { events->Add(std::move(x)); };
+
+            auto window = m_messageThread.Run([&] { return m_windowClass.Instanciate(settings, listener); });
+            const auto nativeWindow = NativeWindow(window.GetNativeWindow());
+
+            const auto handle = std::make_shared<Win32WindowHandle>(m_messageThread, std::move(window));
+
+            return WindowHandle{
+                .native = nativeWindow,
+                .poll = [=] { return events->Poll(); },
+                .show = [=] { handle->GetWindow().Show(); },
+                .setTitle = [=](auto title) { handle->GetWindow().SetTitle(title); },
+                .setPosition = [=](const auto &position) { handle->GetWindow().SetPosition(position); },
+                .resize = [=](const auto &size) { handle->GetWindow().Resize(size); },
+            };
+        }
     };
-
-    auto CreateWindowFactory(HINSTANCE instance, const Win32WindowFactorySettings &settings) -> WindowFactory
-    {
-        auto thread = StartWin32MessageThread();
-        auto windowClass = CreateWin32WindowClass(instance, settings.className);
-
-        auto factory = Win32WindowFactory{
-            .thread = std::move(thread),
-            .windowClass = std::move(windowClass),
-        };
-
-        const auto ptr = std::make_shared<Win32WindowFactory>(std::move(factory));
-
-        return [=](const auto &settings) { return Instanciate(ptr->thread, ptr->windowClass, settings); };
-    }
 }
 
 namespace Aonir
 {
-    auto CreateWin32WindowFactory(const Win32WindowFactorySettings &settings) -> WindowFactory
+    auto CreateWin32WindowFactory(const Win32WindowManagerSettings &settings) -> WindowFactory
     {
         auto *instance = GetModuleHandleW(nullptr);
-        return CreateWindowFactory(instance, settings);
+
+        auto messageThread = StartWin32MessageThread();
+        auto windowClass = CreateWin32WindowClass(instance, settings.className);
+
+        const auto factory = std::make_shared<Win32WindowFactory>(std::move(messageThread), std::move(windowClass));
+
+        return [=](const auto &x) { return factory->CreateWindowHandle(x); };
     }
 }

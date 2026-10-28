@@ -13,39 +13,40 @@
 #include <winnt.h>
 
 #include <Aonir/Core/Window/Window.hpp>
+#include <Aonir/Core/Window/WindowEvent.hpp>
 
 #include <Aonir/Platform/Win32/Utils/LastError.hpp>
 #include <Aonir/Platform/Win32/Utils/StringConversion.hpp>
 
-#include "WindowHandle.hpp"
+#include "Window.hpp"
 #include "WindowListener.hpp"
 
 namespace
 {
     using namespace Aonir;
 
-    auto GetListener(HWND window) -> Win32WindowListener &
+    auto GetListener(HWND window) -> const WindowListener &
     {
         const auto data = GetWindowLongPtrW(window, GWLP_USERDATA);
-        return *reinterpret_cast<Win32WindowListener *>(data); // NOLINT(performance-no-int-to-ptr)
+        return *reinterpret_cast<const WindowListener *>(data); // NOLINT(performance-no-int-to-ptr)
     }
 
-    auto SetListener(HWND window, LPARAM lparam) -> Win32WindowListener &
+    auto SetListener(HWND window, LPARAM lparam) -> const WindowListener &
     {
         const auto &settings = *reinterpret_cast<CREATESTRUCT *>(lparam); // NOLINT(performance-no-int-to-ptr)
 
-        auto *data = settings.lpCreateParams;
+        const auto *data = settings.lpCreateParams;
         const auto ptr = reinterpret_cast<LONG_PTR>(data);
 
         SetWindowLongPtrW(window, GWLP_USERDATA, ptr);
 
-        return *static_cast<Win32WindowListener *>(data);
+        return *static_cast<const WindowListener *>(data);
     }
 
     auto CALLBACK ProcessMessage(HWND window, UINT type, WPARAM wparam, LPARAM lparam) -> LRESULT
     {
-        auto &listener = type == WM_CREATE ? SetListener(window, lparam) : GetListener(window);
-        return listener.ProcessMessage(window, type, wparam, lparam);
+        const auto &listener = type == WM_CREATE ? SetListener(window, lparam) : GetListener(window);
+        return ProcessWindowMessage(listener, window, type, wparam, lparam);
     }
 }
 
@@ -75,16 +76,16 @@ namespace Aonir
         auto *parent = static_cast<HWND>(nullptr);
         auto *menu = static_cast<HMENU>(nullptr);
 
-        auto ptr = std::make_unique<Win32WindowListener>(std::move(listener));
+        auto ptr = std::make_unique<WindowListener>(std::move(listener));
 
         auto *window = CreateWindowExW(options, m_className.get(), title.c_str(), style, x, y, width, height, parent, menu, m_instance, ptr.get());
 
         if (window == nullptr)
         {
-            throw Win32LastError("Failed to create window");
+            throw Win32LastError("Cannot create window");
         }
 
-        return {.handle = Win32WindowHandle(window), .listener = std::move(ptr)};
+        return Win32Window(window, std::move(ptr));
     }
 
     auto CreateWin32WindowClass(HINSTANCE instance, std::string_view name) -> Win32WindowClass
@@ -95,7 +96,7 @@ namespace Aonir
 
         if (defaultCursor == nullptr)
         {
-            throw Win32LastError("Failed to create default cursor for window class");
+            throw Win32LastError("Cannot create default cursor for window class");
         }
 
         const auto settings = WNDCLASSW{
@@ -115,7 +116,7 @@ namespace Aonir
 
         if (atom == 0)
         {
-            throw Win32LastError("Failed to create window class");
+            throw Win32LastError("Cannot create window class");
         }
 
         const auto *className = reinterpret_cast<const wchar_t *>(atom); // NOLINT(performance-no-int-to-ptr)
