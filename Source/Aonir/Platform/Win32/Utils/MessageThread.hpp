@@ -21,8 +21,8 @@ namespace Aonir
         std::jthread m_thread;
 
     public:
-        explicit Win32MessageThread(DWORD id, std::jthread thread);
-        ~Win32MessageThread();
+        AONIR_PLATFORM_API explicit Win32MessageThread(DWORD id, std::jthread thread);
+        AONIR_PLATFORM_API ~Win32MessageThread();
 
         Win32MessageThread(const Win32MessageThread &) = delete;
         Win32MessageThread(Win32MessageThread &&) = default;
@@ -68,5 +68,5 @@ namespace Aonir
         auto Start(const Task &task) const -> void;
     };
 
-    auto StartWin32MessageThread() -> Win32MessageThread;
+    AONIR_PLATFORM_API auto StartWin32MessageThread() -> Win32MessageThread;
 }

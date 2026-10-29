@@ -17,11 +17,11 @@ namespace Aonir
         DWORD m_code;
 
     public:
-        explicit Win32Exception(std::string message, DWORD code);
+        AONIR_PLATFORM_API explicit Win32Exception(std::string message, DWORD code);
 
         [[nodiscard]] auto GetCode() const -> DWORD;
     };
 
-    auto GetWin32ErrorMessage(DWORD code) -> std::string;
-    auto Win32LastError(std::string_view message) -> Win32Exception;
+    AONIR_PLATFORM_API auto GetWin32ErrorMessage(DWORD code) -> std::string;
+    AONIR_PLATFORM_API auto Win32LastError(std::string_view message) -> Win32Exception;
 }

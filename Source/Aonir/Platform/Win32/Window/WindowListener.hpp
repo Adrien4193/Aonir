@@ -8,5 +8,5 @@
 
 namespace Aonir
 {
-    auto ProcessWindowMessage(const WindowListener &listener, HWND window, UINT type, WPARAM wparam, LPARAM lparam) -> LRESULT;
+    AONIR_PLATFORM_API auto ProcessWindowMessage(const WindowListener &listener, HWND window, UINT type, WPARAM wparam, LPARAM lparam) -> LRESULT;
 }

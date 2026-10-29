@@ -27,10 +27,10 @@ namespace Aonir
         std::unique_ptr<const wchar_t, Deleter> m_className;
 
     public:
-        explicit Win32WindowClass(HINSTANCE instance, LPCWSTR className);
+        AONIR_PLATFORM_API explicit Win32WindowClass(HINSTANCE instance, LPCWSTR className);
 
-        auto Instanciate(const WindowSettings &settings, WindowListener listener) -> Win32Window;
+        AONIR_PLATFORM_API auto Instanciate(const WindowSettings &settings, WindowListener listener) -> Win32Window;
     };
 
-    auto CreateWin32WindowClass(HINSTANCE instance, std::string_view name) -> Win32WindowClass;
+    AONIR_PLATFORM_API auto CreateWin32WindowClass(HINSTANCE instance, std::string_view name) -> Win32WindowClass;
 }
