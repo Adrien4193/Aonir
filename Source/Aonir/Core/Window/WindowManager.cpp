@@ -24,13 +24,13 @@ namespace Aonir
 
         auto window = WindowPrivate{
             .handle = std::move(handle),
-            .title = settings.title,
+            .title = std::string(settings.title),
             .position = settings.position,
             .size = settings.size,
             .events = {},
         };
 
-        auto [i, inserted] = m_windows.emplace(nativeWindow, std::move(window));
+        auto [i, inserted] = m_windows.emplace(nativeWindow.ptr, std::move(window));
         assert(inserted);
 
         return Window(i->second);
@@ -38,7 +38,7 @@ namespace Aonir
 
     auto WindowManager::Remove(Window window) -> void
     {
-        m_windows.erase(window.GetNativeWindow());
+        m_windows.erase(window.GetNativeWindow().ptr);
     }
 
     auto WindowManager::Poll() -> void

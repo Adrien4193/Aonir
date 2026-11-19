@@ -2,6 +2,7 @@
 
 #include <format>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include <vulkan/vk_enum_string_helper.h>
@@ -22,7 +23,7 @@ namespace Aonir
         return m_result;
     }
 
-    auto ThrowIfVulkanError(const char *message, VkResult result) -> void
+    auto ThrowIfVulkanError(std::string_view message, VkResult result) -> void
     {
         if (result == VK_SUCCESS)
         {

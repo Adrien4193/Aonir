@@ -1,3 +1,4 @@
+#include <array>
 #include <format>
 #include <print>
 #include <utility>
@@ -12,7 +13,7 @@
 
 #include <Aonir/Platform/Win32/Window/WindowFactory.hpp>
 
-#include <Aonir/Vulkan/GpuFactory.hpp>
+#include <Aonir/Vulkan/Instance.hpp>
 
 using namespace Aonir;
 
@@ -51,7 +52,7 @@ auto main(int argc, const char **argv) -> int
         logger.Info("argv [{}]: {}", i, argv[i]);
     }
 
-    auto windows = WindowManager(CreateWin32WindowFactory({.className = "Aonir"}));
+    auto windows = WindowManager(CreateWin32WindowFactory({.name = "Aonir"}));
 
     auto window = windows.Add({
         .title = "Sandbox",
@@ -61,20 +62,23 @@ auto main(int argc, const char **argv) -> int
 
     window.Show();
 
-    const auto extensions = GetAvailableVulkanExtensions();
-    const auto layers = GetAvailableVulkanValidationLayers();
+    const auto availableExtensions = GetAvailableVulkanExtensions();
+    const auto extensions = std::array<const char *, 1>{vulkanDebugExtensionName};
 
-    const auto gpuFactory = CreateVulkanInstance({
+    const auto availableLayers = GetAvailableVulkanValidationLayers();
+    const auto layers = std::array<const char *, 1>{khronosValidationLayer};
+
+    const auto instance = CreateVulkanInstance({
         .applicationName = "Sandbox",
         .applicationVersion = Version{.major = 1, .minor = 0, .patch = 0},
         .engineName = "Aonir",
         .engineVersion = Version{.major = 1, .minor = 0, .patch = 0},
-        .extensions = {GetVulkanDebugExtensionName()},
-        .validationLayers = {GetKhronosVulkanValidationLayerName()},
+        .extensions = extensions,
+        .validationLayers = layers,
         .logger = &logger,
     });
 
-    (void)gpuFactory;
+    (void)instance;
 
     auto closed = false;
 

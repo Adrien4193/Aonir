@@ -1,7 +1,6 @@
 #include "Window.hpp"
 
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include "WindowEvent.hpp"
@@ -28,7 +27,7 @@ namespace Aonir
         return m_window->title;
     }
 
-    auto Window::SetTitle(std::string_view title) -> void
+    auto Window::SetTitle(const char *title) -> void
     {
         m_window->handle.setTitle(title);
     }

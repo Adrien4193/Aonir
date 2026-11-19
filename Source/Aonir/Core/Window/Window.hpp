@@ -1,10 +1,6 @@
 #pragma once
 
-#include <compare>
-#include <functional>
 #include <string>
-#include <string_view>
-#include <variant>
 #include <vector>
 
 #include "WindowEvent.hpp"
@@ -13,7 +9,7 @@ namespace Aonir
 {
     struct WindowSettings
     {
-        std::string title;
+        const char *title;
         WindowPosition position;
         WindowSize size;
     };
@@ -21,8 +17,6 @@ namespace Aonir
     struct NativeWindow
     {
         void *ptr;
-
-        auto operator<=>(const NativeWindow &) const = default;
     };
 
     struct WindowHandle
@@ -30,7 +24,7 @@ namespace Aonir
         NativeWindow native;
         std::function<auto()->std::vector<WindowEvent>> poll;
         std::function<auto()->void> show;
-        std::function<auto(std::string_view)->void> setTitle;
+        std::function<auto(const char *)->void> setTitle;
         std::function<auto(const WindowPosition &)->void> setPosition;
         std::function<auto(const WindowSize &)->void> resize;
     };
@@ -55,7 +49,7 @@ namespace Aonir
         [[nodiscard]] AONIR_CORE_API auto GetNativeWindow() const -> NativeWindow;
         AONIR_CORE_API auto Show() -> void;
         [[nodiscard]] AONIR_CORE_API auto GetTitle() const -> const std::string &;
-        AONIR_CORE_API auto SetTitle(std::string_view title) -> void;
+        AONIR_CORE_API auto SetTitle(const char *title) -> void;
         [[nodiscard]] AONIR_CORE_API auto GetPosition() const -> const WindowPosition &;
         AONIR_CORE_API auto SetPosition(const WindowPosition &position) -> void;
         [[nodiscard]] AONIR_CORE_API auto GetSize() const -> const WindowSize &;

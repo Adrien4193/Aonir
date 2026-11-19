@@ -1,6 +1,5 @@
 #pragma once
 
-#include <compare>
 #include <functional>
 #include <vector>
 
@@ -11,8 +10,6 @@ namespace Aonir
     struct NativeGpuFactory
     {
         void *ptr;
-
-        auto operator<=>(const NativeGpuFactory &) const = default;
     };
 
     struct GpuFactory

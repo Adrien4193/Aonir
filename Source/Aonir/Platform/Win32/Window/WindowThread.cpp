@@ -1,4 +1,4 @@
-#include "MessageThread.hpp"
+#include "WindowThread.hpp"
 
 #include <cassert>
 #include <functional>
@@ -12,7 +12,7 @@
 #include <minwindef.h>
 #include <processthreadsapi.h>
 
-#include "LastError.hpp"
+#include <Aonir/Platform/Win32/Utils/LastError.hpp>
 
 namespace
 {
@@ -22,7 +22,7 @@ namespace
 
     auto RunTask(WPARAM wparam) -> void
     {
-        const auto &task = *reinterpret_cast<const Win32MessageThread::Task *>(wparam); // NOLINT(performance-no-int-to-ptr)
+        const auto &task = *reinterpret_cast<const Win32WindowThread::Task *>(wparam); // NOLINT(performance-no-int-to-ptr)
         task();
     }
 
@@ -70,13 +70,13 @@ namespace
 
 namespace Aonir
 {
-    Win32MessageThread::Win32MessageThread(DWORD id, std::jthread thread):
+    Win32WindowThread::Win32WindowThread(DWORD id, std::jthread thread):
         m_id(id),
         m_thread(std::move(thread))
     {
     }
 
-    Win32MessageThread::~Win32MessageThread()
+    Win32WindowThread::~Win32WindowThread()
     {
         if (m_thread.joinable())
         {
@@ -85,7 +85,7 @@ namespace Aonir
         }
     }
 
-    auto Win32MessageThread::Start(const Task &task) const -> void
+    auto Win32WindowThread::Start(const Task &task) const -> void
     {
         const auto wparam = reinterpret_cast<WPARAM>(&task);
 
@@ -97,7 +97,7 @@ namespace Aonir
         }
     }
 
-    auto StartWin32MessageThread() -> Win32MessageThread
+    auto StartWin32WindowThread() -> Win32WindowThread
     {
         auto promise = std::promise<void>();
         auto future = promise.get_future();
@@ -113,6 +113,6 @@ namespace Aonir
 
         const auto id = GetThreadId(thread.native_handle());
 
-        return Win32MessageThread(id, std::move(thread));
+        return Win32WindowThread(id, std::move(thread));
     }
 }

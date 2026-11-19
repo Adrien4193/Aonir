@@ -8,6 +8,7 @@
 
 #include <WinUser.h>
 #include <basetsd.h>
+#include <libloaderapi.h>
 #include <minwindef.h>
 #include <windef.h>
 #include <winnt.h>
@@ -88,9 +89,11 @@ namespace Aonir
         return Win32Window(window, std::move(ptr));
     }
 
-    auto CreateWin32WindowClass(HINSTANCE instance, std::string_view name) -> Win32WindowClass
+    auto CreateWin32WindowClass(const Win32WindowClassSettings &settings) -> Win32WindowClass
     {
-        const auto wname = ToUtf16(name);
+        auto *instance = GetModuleHandleW(nullptr);
+
+        const auto wname = ToUtf16(settings.name);
 
         auto *defaultCursor = LoadCursorW(nullptr, IDC_ARROW);
 
@@ -99,7 +102,8 @@ namespace Aonir
             throw Win32LastError("Cannot create default cursor for window class");
         }
 
-        const auto settings = WNDCLASSW{
+        const auto windowClass = WNDCLASSEXW{
+            .cbSize = sizeof(WNDCLASSEXW),
             .style = 0,
             .lpfnWndProc = &ProcessMessage,
             .cbClsExtra = 0,
@@ -110,9 +114,10 @@ namespace Aonir
             .hbrBackground = nullptr,
             .lpszMenuName = nullptr,
             .lpszClassName = wname.c_str(),
+            .hIconSm = nullptr,
         };
 
-        const auto atom = RegisterClassW(&settings);
+        const auto atom = RegisterClassExW(&windowClass);
 
         if (atom == 0)
         {

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <functional>
 #include <memory>
 #include <string_view>
+#include <type_traits>
 
 #include <Windows.h>
 
@@ -13,6 +13,11 @@
 
 namespace Aonir
 {
+    struct Win32WindowClassSettings
+    {
+        std::string_view name;
+    };
+
     class Win32WindowClass
     {
     private:
@@ -24,7 +29,7 @@ namespace Aonir
         };
 
         HINSTANCE m_instance;
-        std::unique_ptr<const wchar_t, Deleter> m_className;
+        std::unique_ptr<std::remove_pointer_t<LPCWSTR>, Deleter> m_className;
 
     public:
         AONIR_PLATFORM_API explicit Win32WindowClass(HINSTANCE instance, LPCWSTR className);
@@ -32,5 +37,5 @@ namespace Aonir
         AONIR_PLATFORM_API auto Instanciate(const WindowSettings &settings, WindowListener listener) -> Win32Window;
     };
 
-    AONIR_PLATFORM_API auto CreateWin32WindowClass(HINSTANCE instance, std::string_view name) -> Win32WindowClass;
+    AONIR_PLATFORM_API auto CreateWin32WindowClass(const Win32WindowClassSettings &settings) -> Win32WindowClass;
 }

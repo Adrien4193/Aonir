@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <memory>
-#include <string_view>
 #include <utility>
 
 #include <Windows.h> // NOLINT(misc-include-cleaner)
@@ -30,7 +29,7 @@ namespace Aonir
     {
     }
 
-    auto Win32Window::GetNativeWindow() const -> HWND
+    auto Win32Window::GetHandle() const -> HWND
     {
         return m_handle.get();
     }
@@ -40,7 +39,7 @@ namespace Aonir
         ShowWindow(m_handle.get(), SW_NORMAL);
     }
 
-    auto Win32Window::SetTitle(std::string_view title) -> void
+    auto Win32Window::SetTitle(const char *title) -> void
     {
         const auto wtitle = ToUtf16(title);
 

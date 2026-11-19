@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string_view>
+
 #include <vulkan/vulkan_core.h>
 
 #include <Aonir/Core/Utils/Exception.hpp>
@@ -17,5 +19,5 @@ namespace Aonir
         [[nodiscard]] AONIR_VULKAN_API auto GetResult() const -> VkResult;
     };
 
-    AONIR_VULKAN_API auto ThrowIfVulkanError(const char *message, VkResult result) -> void;
+    AONIR_VULKAN_API auto ThrowIfVulkanError(std::string_view message, VkResult result) -> void;
 }

@@ -1,8 +1,7 @@
 #pragma once
 
 #include <functional>
-#include <map>
-#include <string>
+#include <unordered_map>
 
 #include "Window.hpp"
 
@@ -14,7 +13,7 @@ namespace Aonir
     {
     private:
         WindowFactory m_factory;
-        std::map<NativeWindow, WindowPrivate> m_windows;
+        std::unordered_map<void *, WindowPrivate> m_windows;
 
     public:
         AONIR_CORE_API explicit WindowManager(WindowFactory factory);

@@ -18,14 +18,14 @@ namespace std
     template<>
     struct formatter<Aonir::Codepoint>
     {
-        static constexpr auto parse(std::format_parse_context &ctx)
+        static constexpr auto parse(std::format_parse_context &context)
         {
-            return ctx.begin();
+            return context.begin();
         }
 
-        static auto format(Aonir::Codepoint codepoint, std::format_context &ctx)
+        static auto format(Aonir::Codepoint codepoint, std::format_context &context)
         {
-            return std::format_to(ctx.out(), "U+{:04X}", std::to_underlying(codepoint));
+            return std::format_to(context.out(), "U+{:04X}", std::to_underlying(codepoint));
         }
     };
 }
