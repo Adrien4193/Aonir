@@ -1,8 +1,9 @@
-#include <array>
 #include <format>
 #include <print>
 #include <utility>
 #include <variant>
+
+#include <vulkan/vulkan_core.h>
 
 #include <Aonir/Core/Utils/Logger.hpp>
 #include <Aonir/Core/Utils/Overload.hpp>
@@ -77,7 +78,7 @@ auto main(int argc, const char **argv) -> int
 
     auto physicalDevices = instance.GetAvailablePhysicalDevices();
 
-    auto queuePriority = 1.0F;
+    const auto queuePriority = 1.0F;
     auto queue = VkDeviceQueueCreateInfo{
         .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
         .pNext = nullptr,
