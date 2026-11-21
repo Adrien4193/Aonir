@@ -9,19 +9,16 @@
 
 namespace Aonir
 {
-    struct VulkanPhysicalDevice
+    struct VulkanQueueSettings
     {
-        VkPhysicalDevice handle;
-        std::vector<VkExtensionProperties> availableExtensions;
-        VkPhysicalDeviceProperties properties;
-        std::vector<VkQueueFamilyProperties> queueFamilies;
+        std::uint32_t family;
+        std::span<const float> priorities;
     };
 
     struct VulkanDeviceSettings
     {
-        VkPhysicalDevice physicalDevice;
         std::span<const char *const> extensions;
-        std::span<const VkDeviceQueueCreateInfo> queues;
+        std::span<const VulkanQueueSettings> queues;
         VkPhysicalDeviceFeatures features;
     };
 
@@ -34,5 +31,25 @@ namespace Aonir
         AONIR_VULKAN_API explicit VulkanDevice(VkDevice handle);
 
         [[nodiscard]] AONIR_VULKAN_API auto GetHandle() const -> VkDevice;
+    };
+
+    struct VulkanPhysicalDeviceProperties
+    {
+        std::vector<VkExtensionProperties> availableExtensions;
+        VkPhysicalDeviceProperties properties;
+        std::vector<VkQueueFamilyProperties> queueFamilies;
+    };
+
+    class VulkanPhysicalDevice
+    {
+    private:
+        VkPhysicalDevice m_handle;
+
+    public:
+        AONIR_VULKAN_API explicit VulkanPhysicalDevice(VkPhysicalDevice handle);
+
+        [[nodiscard]] AONIR_VULKAN_API auto GetHandle() const -> VkPhysicalDevice;
+        [[nodiscard]] AONIR_VULKAN_API auto GetProperties() const -> VulkanPhysicalDeviceProperties;
+        AONIR_VULKAN_API auto CreateDevice(const VulkanDeviceSettings &settings) -> VulkanDevice;
     };
 }

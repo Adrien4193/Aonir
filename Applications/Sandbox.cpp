@@ -3,8 +3,6 @@
 #include <utility>
 #include <variant>
 
-#include <vulkan/vulkan_core.h>
-
 #include <Aonir/Core/Utils/Logger.hpp>
 #include <Aonir/Core/Utils/Overload.hpp>
 #include <Aonir/Core/Utils/Version.hpp>
@@ -14,6 +12,7 @@
 
 #include <Aonir/Platform/Win32/Window/WindowFactory.hpp>
 
+#include <Aonir/Vulkan/Device.hpp>
 #include <Aonir/Vulkan/Instance.hpp>
 
 using namespace Aonir;
@@ -79,17 +78,13 @@ auto main(int argc, const char **argv) -> int
     auto physicalDevices = instance.GetAvailablePhysicalDevices();
 
     const auto queuePriority = 1.0F;
-    auto queue = VkDeviceQueueCreateInfo{
-        .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = 0,
-        .queueFamilyIndex = 0,
-        .queueCount = 1,
-        .pQueuePriorities = &queuePriority,
+
+    const auto queue = VulkanQueueSettings{
+        .family = 0,
+        .priorities = {&queuePriority, 1},
     };
 
-    const auto device = instance.CreateDevice({
-        .physicalDevice = physicalDevices[0].handle,
+    const auto device = physicalDevices[0].CreateDevice({
         .extensions = {},
         .queues = {&queue, 1},
         .features = VkPhysicalDeviceFeatures(),

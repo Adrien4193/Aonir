@@ -70,7 +70,6 @@ namespace Aonir
 
         [[nodiscard]] AONIR_VULKAN_API auto GetHandle() const -> VkInstance;
         AONIR_VULKAN_API auto GetAvailablePhysicalDevices() -> std::vector<VulkanPhysicalDevice>;
-        AONIR_VULKAN_API auto CreateDevice(const VulkanDeviceSettings &settings) -> VulkanDevice;
     };
 
     AONIR_VULKAN_API auto CreateVulkanInstance(const VulkanInstanceSettings &settings) -> VulkanInstance;

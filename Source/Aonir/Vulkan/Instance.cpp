@@ -10,13 +10,12 @@
 #include <vulkan/vk_platform.h>
 #include <vulkan/vulkan_core.h>
 
-#include <Aonir/Core/Renderer/GpuDevice.hpp>
 #include <Aonir/Core/Utils/Exception.hpp>
 #include <Aonir/Core/Utils/Flags.hpp>
 #include <Aonir/Core/Utils/Logger.hpp>
 
 #include "Device.hpp"
-#include "Utils.hpp"
+#include "Error.hpp"
 
 namespace
 {
@@ -99,52 +98,6 @@ namespace
 
         return VulkanDebugMessenger{messenger, {.instance = instance, .destroyMessenger = destroyMessenger}};
     }
-
-    auto GetPhysicalDeviceProperties(VkPhysicalDevice device) -> VulkanPhysicalDevice
-    {
-        auto extensionCount = std::uint32_t();
-
-        auto result = vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
-        ThrowIfVulkanError("Cannot get number of available Vulkan physical device extensions", result);
-
-        auto availableExtensions = std::vector<VkExtensionProperties>(static_cast<std::size_t>(extensionCount));
-
-        result = vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
-        ThrowIfVulkanError("Cannot enumerate available Vulkan physical device extensions", result);
-
-        auto properties = VkPhysicalDeviceProperties();
-        vkGetPhysicalDeviceProperties(device, &properties);
-
-        auto queueFamilyCount = std::uint32_t();
-        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-
-        auto queueFamilies = std::vector<VkQueueFamilyProperties>(queueFamilyCount);
-        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
-
-        return {
-            .handle = device,
-            .availableExtensions = availableExtensions,
-            .properties = properties,
-            .queueFamilies = std::move(queueFamilies),
-        };
-    }
-
-    auto GetPhysicalDeviceType(VkPhysicalDeviceType type) -> std::optional<GpuAdapterType>
-    {
-        switch (type)
-        {
-        case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
-            return GpuAdapterType::IntegratedGpu;
-        case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
-            return GpuAdapterType::DiscreteGpu;
-        case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
-            return GpuAdapterType::VirtualGpu;
-        case VK_PHYSICAL_DEVICE_TYPE_CPU:
-            return GpuAdapterType::Cpu;
-        default:
-            return std::nullopt;
-        }
-    }
 }
 
 namespace Aonir
@@ -219,33 +172,9 @@ namespace Aonir
         result = vkEnumeratePhysicalDevices(instance, &deviceCount, availableDevices.data());
         ThrowIfVulkanError("Cannot enumerate Vulkan physical devices", result);
 
-        const auto toDevice = [](auto x) { return GetPhysicalDeviceProperties(x); };
+        const auto toDevice = [](auto x) { return VulkanPhysicalDevice(x); };
 
         return availableDevices | std::views::transform(toDevice) | std::ranges::to<std::vector>();
-    }
-
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    auto VulkanInstance::CreateDevice(const VulkanDeviceSettings &settings) -> VulkanDevice
-    {
-        const auto deviceInfo = VkDeviceCreateInfo{
-            .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .queueCreateInfoCount = static_cast<std::uint32_t>(settings.queues.size()),
-            .pQueueCreateInfos = settings.queues.data(),
-            .enabledLayerCount = 0,
-            .ppEnabledLayerNames = nullptr,
-            .enabledExtensionCount = static_cast<std::uint32_t>(settings.extensions.size()),
-            .ppEnabledExtensionNames = settings.extensions.data(),
-            .pEnabledFeatures = &settings.features,
-        };
-
-        auto *device = VkDevice();
-
-        const auto result = vkCreateDevice(settings.physicalDevice, &deviceInfo, nullptr, &device);
-        ThrowIfVulkanError("Cannot create Vulkan logical device", result);
-
-        return VulkanDevice{device};
     }
 
     auto CreateVulkanInstance(const VulkanInstanceSettings &settings) -> VulkanInstance
