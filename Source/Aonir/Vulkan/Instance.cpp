@@ -15,6 +15,7 @@
 #include <Aonir/Core/Utils/Flags.hpp>
 #include <Aonir/Core/Utils/Logger.hpp>
 
+#include "Device.hpp"
 #include "Utils.hpp"
 
 namespace
@@ -101,6 +102,16 @@ namespace
 
     auto GetPhysicalDeviceProperties(VkPhysicalDevice device) -> VulkanPhysicalDevice
     {
+        auto extensionCount = std::uint32_t();
+
+        auto result = vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+        ThrowIfVulkanError("Cannot get number of available Vulkan physical device extensions", result);
+
+        auto availableExtensions = std::vector<VkExtensionProperties>(static_cast<std::size_t>(extensionCount));
+
+        result = vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+        ThrowIfVulkanError("Cannot enumerate available Vulkan physical device extensions", result);
+
         auto properties = VkPhysicalDeviceProperties();
         vkGetPhysicalDeviceProperties(device, &properties);
 
@@ -112,6 +123,7 @@ namespace
 
         return {
             .handle = device,
+            .availableExtensions = availableExtensions,
             .properties = properties,
             .queueFamilies = std::move(queueFamilies),
         };
@@ -142,12 +154,12 @@ namespace Aonir
         auto extensionCount = std::uint32_t();
 
         auto result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-        ThrowIfVulkanError("Cannot get number of Vulkan extensions", result);
+        ThrowIfVulkanError("Cannot get number of available Vulkan extensions", result);
 
         auto availableExtensions = std::vector<VkExtensionProperties>(static_cast<std::size_t>(extensionCount));
 
         result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableExtensions.data());
-        ThrowIfVulkanError("Cannot enumerate Vulkan extensions", result);
+        ThrowIfVulkanError("Cannot enumerate available Vulkan extensions", result);
 
         const auto toExtension = [](const auto &x)
         {
@@ -210,6 +222,30 @@ namespace Aonir
         const auto toDevice = [](auto x) { return GetPhysicalDeviceProperties(x); };
 
         return availableDevices | std::views::transform(toDevice) | std::ranges::to<std::vector>();
+    }
+
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+    auto VulkanInstance::CreateDevice(const VulkanDeviceSettings &settings) -> VulkanDevice
+    {
+        const auto deviceInfo = VkDeviceCreateInfo{
+            .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .queueCreateInfoCount = static_cast<std::uint32_t>(settings.queues.size()),
+            .pQueueCreateInfos = settings.queues.data(),
+            .enabledLayerCount = 0,
+            .ppEnabledLayerNames = nullptr,
+            .enabledExtensionCount = static_cast<std::uint32_t>(settings.extensions.size()),
+            .ppEnabledExtensionNames = settings.extensions.data(),
+            .pEnabledFeatures = &settings.features,
+        };
+
+        auto *device = VkDevice();
+
+        const auto result = vkCreateDevice(settings.physicalDevice, &deviceInfo, nullptr, &device);
+        ThrowIfVulkanError("Cannot create Vulkan logical device", result);
+
+        return VulkanDevice{device};
     }
 
     auto CreateVulkanInstance(const VulkanInstanceSettings &settings) -> VulkanInstance

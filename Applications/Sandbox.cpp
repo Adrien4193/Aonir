@@ -63,22 +63,38 @@ auto main(int argc, const char **argv) -> int
     window.Show();
 
     const auto availableExtensions = GetAvailableVulkanExtensions();
-    const auto extensions = std::array<const char *, 1>{vulkanDebugExtensionName};
-
     const auto availableLayers = GetAvailableVulkanValidationLayers();
-    const auto layers = std::array<const char *, 1>{khronosValidationLayer};
 
-    const auto instance = CreateVulkanInstance({
+    auto instance = CreateVulkanInstance({
         .applicationName = "Sandbox",
         .applicationVersion = Version{.major = 1, .minor = 0, .patch = 0},
         .engineName = "Aonir",
         .engineVersion = Version{.major = 1, .minor = 0, .patch = 0},
-        .extensions = extensions,
-        .validationLayers = layers,
+        .extensions = {&vulkanDebugExtensionName, 1},
+        .validationLayers = {&khronosValidationLayer, 1},
         .logger = &logger,
     });
 
-    (void)instance;
+    auto physicalDevices = instance.GetAvailablePhysicalDevices();
+
+    auto queuePriority = 1.0F;
+    auto queue = VkDeviceQueueCreateInfo{
+        .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .queueFamilyIndex = 0,
+        .queueCount = 1,
+        .pQueuePriorities = &queuePriority,
+    };
+
+    const auto device = instance.CreateDevice({
+        .physicalDevice = physicalDevices[0].handle,
+        .extensions = {},
+        .queues = {&queue, 1},
+        .features = VkPhysicalDeviceFeatures(),
+    });
+
+    (void)device;
 
     auto closed = false;
 

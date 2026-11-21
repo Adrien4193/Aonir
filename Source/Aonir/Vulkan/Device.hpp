@@ -1,15 +1,28 @@
 #pragma once
 
 #include <memory>
+#include <span>
 #include <type_traits>
+#include <vector>
 
 #include <vulkan/vulkan_core.h>
 
 namespace Aonir
 {
+    struct VulkanPhysicalDevice
+    {
+        VkPhysicalDevice handle;
+        std::vector<VkExtensionProperties> availableExtensions;
+        VkPhysicalDeviceProperties properties;
+        std::vector<VkQueueFamilyProperties> queueFamilies;
+    };
+
     struct VulkanDeviceSettings
     {
         VkPhysicalDevice physicalDevice;
+        std::span<const char *const> extensions;
+        std::span<const VkDeviceQueueCreateInfo> queues;
+        VkPhysicalDeviceFeatures features;
     };
 
     class VulkanDevice
