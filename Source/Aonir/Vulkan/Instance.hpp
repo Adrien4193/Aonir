@@ -22,6 +22,7 @@ namespace Aonir
     };
 
     constexpr const auto *vulkanDebugExtensionName = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+    constexpr const auto *khronosSurfaceExtensionName = VK_KHR_SURFACE_EXTENSION_NAME;
 
     AONIR_VULKAN_API auto GetAvailableVulkanExtensions() -> std::vector<VulkanExtension>;
 

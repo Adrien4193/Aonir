@@ -47,6 +47,13 @@ namespace Aonir
         return m_handle.get();
     }
 
+    auto VulkanDevice::GetQueue(std::uint32_t family, std::uint32_t index) const -> VkQueue
+    {
+        auto queue = VkQueue();
+        vkGetDeviceQueue(m_handle.get(), family, index, &queue);
+        return queue;
+    }
+
     VulkanPhysicalDevice::VulkanPhysicalDevice(VkPhysicalDevice handle):
         m_handle(handle)
     {

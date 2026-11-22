@@ -31,6 +31,7 @@ namespace Aonir
         AONIR_VULKAN_API explicit VulkanDevice(VkDevice handle);
 
         [[nodiscard]] AONIR_VULKAN_API auto GetHandle() const -> VkDevice;
+        [[nodiscard]] AONIR_VULKAN_API auto GetQueue(std::uint32_t family, std::uint32_t index) const -> VkQueue;
     };
 
     struct VulkanPhysicalDeviceProperties
@@ -50,6 +51,6 @@ namespace Aonir
 
         [[nodiscard]] AONIR_VULKAN_API auto GetHandle() const -> VkPhysicalDevice;
         [[nodiscard]] AONIR_VULKAN_API auto GetProperties() const -> VulkanPhysicalDeviceProperties;
-        AONIR_VULKAN_API auto CreateDevice(const VulkanDeviceSettings &settings) -> VulkanDevice;
+        [[nodiscard]] AONIR_VULKAN_API auto CreateDevice(const VulkanDeviceSettings &settings) -> VulkanDevice;
     };
 }

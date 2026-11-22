@@ -1,17 +1,14 @@
+add_library(Platform)
+
 if(WIN32)
     set(PLATFORM_NAME Win32)
+    target_compile_definitions(Platform PUBLIC UNICODE)
 else()
     message(FATAL_ERROR "Unsupported platform")
 endif()
 
 file(GLOB_RECURSE HEADERS ${PLATFORM_NAME}/*.hpp)
 file(GLOB_RECURSE SOURCES ${PLATFORM_NAME}/*.cpp)
-
-add_library(Platform)
-
-if(WIN32)
-    target_compile_definitions(Platform PUBLIC UNICODE)
-endif()
 
 configure_library(Platform "${HEADERS}" "${SOURCES}")
 

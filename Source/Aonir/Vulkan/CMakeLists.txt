@@ -1,9 +1,9 @@
-file(GLOB_RECURSE HEADERS *.hpp)
-file(GLOB_RECURSE SOURCES *.cpp)
+add_library(Vulkan)
 
 find_package(Vulkan REQUIRED)
 
-add_library(Vulkan)
+file(GLOB_RECURSE HEADERS *.hpp)
+file(GLOB_RECURSE SOURCES *.cpp)
 
 configure_library(Vulkan "${HEADERS}" "${SOURCES}")
 

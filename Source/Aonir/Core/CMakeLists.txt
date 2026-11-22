@@ -1,9 +1,9 @@
+add_library(Core)
+
 find_package(glm CONFIG REQUIRED)
 
 file(GLOB_RECURSE HEADERS *.hpp)
 file(GLOB_RECURSE SOURCES *.cpp)
-
-add_library(Core)
 
 configure_library(Core "${HEADERS}" "${SOURCES}")
 
