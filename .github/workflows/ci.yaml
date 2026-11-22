@@ -29,19 +29,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup C++
-        uses: aminya/setup-cpp@v1.7.1
+        uses: aminya/setup-cpp@v1.10.1
         with:
           compiler: ${{matrix.compiler.name}}
           vcvarsall: ${{runner.os == 'Windows'}}
-          cmake: "4.0.3"
+          cmake: "4.5.1"
           ninja: "1.13.0"
           vcpkg: true
-          clangtidy: "20.1.7"
+          clangtidy: "22.1.1"
       - name: Install NSIS
         if: ${{runner.os == 'Windows'}}
-        uses: repolevedavaj/install-nsis@v1.2.1
+        uses: repolevedavaj/install-nsis@v1.3.0
         with:
-          nsis-version: "3.12"
+          nsis-version: "3.13"
       - name: Run CMake workflow
         run: cmake --workflow --preset ${{matrix.os.preset}}
   format:
@@ -50,7 +50,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run clang-format style check.
-        uses: jidicula/clang-format-action@v4.15.0
+        uses: jidicula/clang-format-action@v4.18.0
         with:
-          clang-format-version: "20"
+          clang-format-version: "22"
           include-regex: ^.*/(Applications|Source|Tests)/.*\.(hpp|cpp)$
