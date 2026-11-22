@@ -12,8 +12,8 @@
 
 #include <Aonir/Platform/Win32/Window/WindowFactory.hpp>
 
-#include <Aonir/Vulkan/Device.hpp>
-#include <Aonir/Vulkan/Instance.hpp>
+#include <Aonir/Vulkan/Core/Device.hpp>
+#include <Aonir/Vulkan/Core/Instance.hpp>
 
 using namespace Aonir;
 

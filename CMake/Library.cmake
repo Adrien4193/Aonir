@@ -45,7 +45,7 @@ function(install_library TARGET)
     install(
         EXPORT ${TARGET}Targets
         FILE ${PROJECT_NAME}${TARGET}Targets.cmake
-        DESTINATION ${PROJECT_INSTALL_CONFIGDIR}
+        DESTINATION ${CONFIG_INSTALL_DIRECTORY}
         NAMESPACE ${PROJECT_NAME}::
         COMPONENT ${TARGET}Development
     )

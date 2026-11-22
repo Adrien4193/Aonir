@@ -23,12 +23,18 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 include(GNUInstallDirs)
 
-set(PROJECT_INSTALL_CONFIGDIR cmake)
+set(CONFIG_INSTALL_DIRECTORY cmake)
 
 include(PackageOptions)
 
 include(Application)
 include(Library)
+
+if(WIN32)
+    set(AONIR_PLATFORM Win32)
+else()
+    message(FATAL_ERROR "Unsupported platform")
+endif()
 
 add_subdirectory(Source/${PROJECT_NAME})
 

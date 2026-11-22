@@ -3,7 +3,7 @@ include(CMakePackageConfigHelpers)
 configure_package_config_file(
     ${PROJECT_SOURCE_DIR}/CMake/PackageConfig.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-    INSTALL_DESTINATION ${PROJECT_INSTALL_CONFIGDIR}
+    INSTALL_DESTINATION ${CONFIG_INSTALL_DIRECTORY}
 )
 
 write_basic_package_version_file(
@@ -16,7 +16,7 @@ install(
     FILES
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    DESTINATION ${PROJECT_INSTALL_CONFIGDIR}
+    DESTINATION ${CONFIG_INSTALL_DIRECTORY}
     COMPONENT Development
 )
 

@@ -2,8 +2,8 @@ add_library(Vulkan)
 
 find_package(Vulkan REQUIRED)
 
-file(GLOB_RECURSE HEADERS *.hpp)
-file(GLOB_RECURSE SOURCES *.cpp)
+file(GLOB_RECURSE HEADERS Core/*.hpp Platform/${AONIR_PLATFORM}/*.hpp)
+file(GLOB_RECURSE SOURCES Core/*.cpp Platform/${AONIR_PLATFORM}/*.cpp)
 
 configure_library(Vulkan "${HEADERS}" "${SOURCES}")
 
