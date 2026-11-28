@@ -8,16 +8,13 @@
 
 #include <WinUser.h>
 #include <basetsd.h>
-#include <libloaderapi.h>
 #include <minwindef.h>
 #include <windef.h>
 #include <winnt.h>
 
-#include <Aonir/Core/Window/Window.hpp>
 #include <Aonir/Core/Window/WindowEvent.hpp>
 
 #include <Aonir/Platform/Win32/Utils/LastError.hpp>
-#include <Aonir/Platform/Win32/Utils/StringConversion.hpp>
 
 #include "Window.hpp"
 #include "WindowListener.hpp"
@@ -60,26 +57,32 @@ namespace Aonir
     }
 
     Win32WindowClass::Win32WindowClass(HINSTANCE instance, LPCWSTR className):
-        m_instance(instance),
         m_className(className, Deleter{instance})
     {
     }
 
-    auto Win32WindowClass::Instanciate(const WindowSettings &settings, WindowListener listener) -> Win32Window
+    auto Win32WindowClass::Instanciate(const Win32WindowSettings &settings, WindowListener listener) -> Win32Window
     {
-        const auto options = static_cast<DWORD>(0);
-        const auto title = ToUtf16(settings.title);
-        const auto style = static_cast<DWORD>(WS_OVERLAPPEDWINDOW);
         const auto x = static_cast<int>(settings.position.x);
         const auto y = static_cast<int>(settings.position.y);
         const auto width = static_cast<int>(settings.size.width);
         const auto height = static_cast<int>(settings.size.height);
-        auto *parent = static_cast<HWND>(nullptr);
-        auto *menu = static_cast<HMENU>(nullptr);
 
         auto ptr = std::make_unique<WindowListener>(std::move(listener));
 
-        auto *window = CreateWindowExW(options, m_className.get(), title.c_str(), style, x, y, width, height, parent, menu, m_instance, ptr.get());
+        auto *window = CreateWindowExW(
+            settings.options,
+            m_className.get(),
+            settings.title,
+            settings.style,
+            x,
+            y,
+            width,
+            height,
+            settings.parent,
+            settings.menu,
+            m_className.get_deleter().instance,
+            ptr.get());
 
         if (window == nullptr)
         {
@@ -91,10 +94,6 @@ namespace Aonir
 
     auto CreateWin32WindowClass(const Win32WindowClassSettings &settings) -> Win32WindowClass
     {
-        auto *instance = GetModuleHandleW(nullptr);
-
-        const auto wname = ToUtf16(settings.name);
-
         auto *defaultCursor = LoadCursorW(nullptr, IDC_ARROW);
 
         if (defaultCursor == nullptr)
@@ -108,12 +107,12 @@ namespace Aonir
             .lpfnWndProc = &ProcessMessage,
             .cbClsExtra = 0,
             .cbWndExtra = 0,
-            .hInstance = instance,
+            .hInstance = settings.instance,
             .hIcon = nullptr,
             .hCursor = defaultCursor,
             .hbrBackground = nullptr,
             .lpszMenuName = nullptr,
-            .lpszClassName = wname.c_str(),
+            .lpszClassName = settings.name,
             .hIconSm = nullptr,
         };
 
@@ -126,6 +125,6 @@ namespace Aonir
 
         const auto *className = reinterpret_cast<const wchar_t *>(atom); // NOLINT(performance-no-int-to-ptr)
 
-        return Win32WindowClass(instance, className);
+        return Win32WindowClass(settings.instance, className);
     }
 }

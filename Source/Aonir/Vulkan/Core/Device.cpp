@@ -49,7 +49,7 @@ namespace Aonir
 
     auto VulkanDevice::GetQueue(std::uint32_t family, std::uint32_t index) const -> VkQueue
     {
-        auto queue = VkQueue();
+        auto *queue = VkQueue();
         vkGetDeviceQueue(m_handle.get(), family, index, &queue);
         return queue;
     }

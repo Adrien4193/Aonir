@@ -25,7 +25,7 @@ namespace Aonir
 
         [[nodiscard]] AONIR_PLATFORM_API auto GetHandle() const -> HWND;
         AONIR_PLATFORM_API auto Show() -> void;
-        AONIR_PLATFORM_API auto SetTitle(const char *title) -> void;
+        AONIR_PLATFORM_API auto SetTitle(LPCWSTR title) -> void;
         AONIR_PLATFORM_API auto SetPosition(const WindowPosition &position) -> void;
         AONIR_PLATFORM_API auto Resize(const WindowSize &size) -> void;
     };

@@ -9,11 +9,11 @@
 #include <WinUser.h>
 #include <minwindef.h>
 #include <windef.h>
+#include <winnt.h>
 
 #include "Aonir/Core/Window/WindowEvent.hpp"
 
 #include <Aonir/Platform/Win32/Utils/LastError.hpp>
-#include <Aonir/Platform/Win32/Utils/StringConversion.hpp>
 
 namespace Aonir
 {
@@ -39,11 +39,9 @@ namespace Aonir
         ShowWindow(m_handle.get(), SW_NORMAL);
     }
 
-    auto Win32Window::SetTitle(const char *title) -> void
+    auto Win32Window::SetTitle(LPCWSTR title) -> void
     {
-        const auto wtitle = ToUtf16(title);
-
-        const auto success = SetWindowTextW(m_handle.get(), wtitle.c_str());
+        const auto success = SetWindowTextW(m_handle.get(), title);
 
         if (success == FALSE)
         {

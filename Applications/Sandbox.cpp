@@ -1,19 +1,27 @@
+#include <array>
 #include <format>
 #include <print>
 #include <utility>
 #include <variant>
 
+#include <Windows.h> // NOLINT(misc-include-cleaner)
+
+#include <libloaderapi.h>
+#include <windef.h>
+
 #include <Aonir/Core/Utils/Logger.hpp>
 #include <Aonir/Core/Utils/Overload.hpp>
-#include <Aonir/Core/Utils/Version.hpp>
 #include <Aonir/Core/Window/Window.hpp>
 #include <Aonir/Core/Window/WindowEvent.hpp>
 #include <Aonir/Core/Window/WindowManager.hpp>
 
+#include <Aonir/Platform/Win32/Utils/StringConversion.hpp>
 #include <Aonir/Platform/Win32/Window/WindowFactory.hpp>
 
 #include <Aonir/Vulkan/Core/Device.hpp>
 #include <Aonir/Vulkan/Core/Instance.hpp>
+
+#include <Aonir/Vulkan/Platform/Win32/Surface.hpp>
 
 using namespace Aonir;
 
@@ -52,7 +60,15 @@ auto main(int argc, const char **argv) -> int
         logger.Info("argv [{}]: {}", i, argv[i]);
     }
 
-    auto windows = WindowManager(CreateWin32WindowFactory({.name = "Aonir"}));
+    auto *win32Instance = GetModuleHandleW(nullptr);
+    const auto className = ToUtf16("Aonir");
+
+    auto windowFactory = CreateWin32WindowFactory({
+        .instance = win32Instance,
+        .name = className.c_str(),
+    });
+
+    auto windows = WindowManager(std::move(windowFactory));
 
     auto window = windows.Add({
         .title = "Sandbox",
@@ -65,13 +81,16 @@ auto main(int argc, const char **argv) -> int
     const auto availableExtensions = GetAvailableVulkanExtensions();
     const auto availableLayers = GetAvailableVulkanValidationLayers();
 
+    const auto extensions = std::array{vulkanDebugExtensionName, khronosSurfaceExtensionName, khronosWin32ExtensionName};
+    const auto layers = std::array{khronosValidationLayer};
+
     auto instance = CreateVulkanInstance({
         .applicationName = "Sandbox",
-        .applicationVersion = Version{.major = 1, .minor = 0, .patch = 0},
+        .applicationVersion = {.major = 1, .minor = 0, .patch = 0},
         .engineName = "Aonir",
-        .engineVersion = Version{.major = 1, .minor = 0, .patch = 0},
-        .extensions = {&vulkanDebugExtensionName, 1},
-        .validationLayers = {&khronosValidationLayer, 1},
+        .engineVersion = {.major = 1, .minor = 0, .patch = 0},
+        .extensions = extensions,
+        .validationLayers = layers,
         .logger = &logger,
     });
 
@@ -91,6 +110,14 @@ auto main(int argc, const char **argv) -> int
     });
 
     (void)device;
+
+    const auto surface = CreateWin32VulkanSurface({
+        .vulkanInstance = instance.GetHandle(),
+        .win32Instance = win32Instance,
+        .window = static_cast<HWND>(window.GetNativeWindow().ptr),
+    });
+
+    (void)surface;
 
     auto closed = false;
 

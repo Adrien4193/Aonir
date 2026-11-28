@@ -7,9 +7,15 @@
 #include <utility>
 #include <vector>
 
+#include <Windows.h> // NOLINT(misc-include-cleaner)
+
+#include <WinUser.h>
+
 #include <Aonir/Core/Window/Window.hpp>
 #include <Aonir/Core/Window/WindowEvent.hpp>
 #include <Aonir/Core/Window/WindowManager.hpp>
+
+#include <Aonir/Platform/Win32/Utils/StringConversion.hpp>
 
 #include "Window.hpp"
 #include "WindowClass.hpp"
@@ -50,6 +56,11 @@ namespace Aonir
 
     Win32WindowHandle::~Win32WindowHandle()
     {
+        if (!m_window)
+        {
+            return;
+        }
+
         try
         {
             m_windowThread->Run([this] { m_window.reset(); });
@@ -73,10 +84,21 @@ namespace Aonir
 
     auto Win32WindowFactory::CreateWindowHandle(const WindowSettings &settings) -> WindowHandle
     {
+        const auto wtitle = ToUtf16(settings.title);
+        auto win32Settings = Win32WindowSettings{
+            .title = wtitle.c_str(),
+            .position = settings.position,
+            .size = settings.size,
+            .parent = nullptr,
+            .options = 0,
+            .style = WS_OVERLAPPEDWINDOW,
+            .menu = nullptr,
+        };
+
         const auto events = std::make_shared<EventBuffer>();
         const auto listener = [=](auto x) { events->Add(std::move(x)); };
 
-        auto window = m_windowThread.Run([&] { return m_windowClass.Instanciate(settings, listener); });
+        auto window = m_windowThread.Run([&] { return m_windowClass.Instanciate(win32Settings, listener); });
         const auto nativeWindow = NativeWindow(window.GetHandle());
 
         const auto handle = std::make_shared<Win32WindowHandle>(m_windowThread, std::move(window));
@@ -85,9 +107,9 @@ namespace Aonir
             .native = nativeWindow,
             .poll = [=] { return events->Poll(); },
             .show = [=] { handle->GetWindow().Show(); },
-            .setTitle = [=](auto title) { handle->GetWindow().SetTitle(title); },
-            .setPosition = [=](const auto &position) { handle->GetWindow().SetPosition(position); },
-            .resize = [=](const auto &size) { handle->GetWindow().Resize(size); },
+            .setTitle = [=](auto x) { handle->GetWindow().SetTitle(ToUtf16(x).c_str()); },
+            .setPosition = [=](const auto &x) { handle->GetWindow().SetPosition(x); },
+            .resize = [=](const auto &x) { handle->GetWindow().Resize(x); },
         };
     }
 
